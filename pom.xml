@@ -5,7 +5,7 @@
 
   <groupId>org.gbif</groupId>
   <artifactId>text-tree</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
 
   <name>Text Tree</name>
   <description>A simple taxonomic tree format using indented plain text.</description>
@@ -17,10 +17,6 @@
     <developerConnection>scm:git:git@github.com:gbif/text-tree.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
-
-  <prerequisites>
-    <maven>${minimumMavenVersion}</maven>
-  </prerequisites>
 
   <properties>
     <minimumMavenVersion>3.3</minimumMavenVersion>
@@ -65,6 +61,16 @@
     <system>github</system>
     <url>https://github.com/gbif/text-tree/issues</url>
   </issueManagement>
+
+  <repositories>
+    <repository>
+      <id>gbif-all</id>
+      <url>http://repository.gbif.org/repository/gbif</url>
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
 
   <distributionManagement>
     <repository>
@@ -293,14 +299,6 @@
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
         <version>${maven-source-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <!-- run integration tests (*IT) during verify -->
       <plugin>
@@ -349,18 +347,6 @@
                 </requireReleaseDeps>
               </rules>
             </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                  <goal>test-jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
