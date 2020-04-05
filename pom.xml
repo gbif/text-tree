@@ -275,6 +275,7 @@
             <goals>deploy</goals>
             <preparationGoals>install</preparationGoals>
             <resume>false</resume>
+            <arguments>-Dmaven.javadoc.skip=true</arguments>
             <useReleaseProfile>true</useReleaseProfile>
             <releaseProfiles>release</releaseProfiles>
             <tagNameFormat>${project.artifactId}-@{project.version}</tagNameFormat>
