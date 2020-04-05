@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.gbif</groupId>
+  <artifactId>text-tree</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Text Tree</name>
+  <description>A simple taxonomic tree format using indented plain text.</description>
+  <url>http://github.org/gbif/text-tree</url>
+
+  <scm>
+    <connection>scm:git:git@github.com:gbif/text-tree.git</connection>
+    <url>https://github.com/gbif/text-tree</url>
+    <developerConnection>scm:git:git@github.com:gbif/text-tree.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <prerequisites>
+    <maven>${minimumMavenVersion}</maven>
+  </prerequisites>
+
+  <properties>
+    <minimumMavenVersion>3.3</minimumMavenVersion>
+    <jdkLevel>11</jdkLevel>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- dependency versions -->
+    <junit.version>4.12</junit.version>
+    <name-parser.version>3.5.0-SNAPSHOT</name-parser.version>
+    <slf4j.version>3.5.0-SNAPSHOT</slf4j.version>
+
+    <!-- Maven plugin versions. Check for available updates: mvn versions:display-plugin-updates -->
+    <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+    <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
+    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+    <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+    <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
+    <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+    <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+    <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+    <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+    <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
+    <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
+    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+    <maven-git-commit-id-plugin.version>4.0.0</maven-git-commit-id-plugin.version>
+    <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+  </properties>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://raw.github.com/gbif/motherpom/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Global Biodiversity Information Facility</name>
+    <url>http://www.gbif.org/</url>
+  </organization>
+
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/gbif/text-tree/issues</url>
+  </issueManagement>
+
+  <distributionManagement>
+    <repository>
+      <id>gbif-release</id>
+      <url>http://repository.gbif.org/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>gbif-snapshot</id>
+      <url>http://repository.gbif.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.gbif</groupId>
+      <artifactId>name-parser-api</artifactId>
+      <version>${name-parser.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.gbif</groupId>
+      <artifactId>name-parser</artifactId>
+      <version>${name-parser.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${maven-clean-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <release>${jdkLevel}</release>
+            <showDeprecation>true</showDeprecation>
+            <showWarnings>true</showWarnings>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${maven-dependency-plugin.version}</version>
+          <!-- following is needed until 3.1.2 is released -->
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.shared</groupId>
+              <artifactId>maven-dependency-analyzer</artifactId>
+              <version>1.11.1</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>enforce-maven-3</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requireMavenVersion>
+                    <version>[${minimumMavenVersion},)</version>
+                  </requireMavenVersion>
+                  <requireJavaVersion>
+                    <version>[${jdkLevel},)</version>
+                  </requireJavaVersion>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>integration-test</id>
+              <goals>
+                <goal>integration-test</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>verify</id>
+              <goals>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <!-- Use a single forked process to execute all tests See https://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html -->
+            <forkCount>1</forkCount>
+            <reuseForks>false</reuseForks>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <!-- mem settings may not be necessary but the 3rd arg is. See here: -->
+            <!-- https://issues.apache.org/jira/browse/SUREFIRE-1588 -->
+            <!-- And here: https://talk.openmrs.org/t/error-could-not-find-or-load-main-class-org-apache-maven-surefire-booter-forkedbooter/20509 -->
+            <argLine>
+              -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+              --illegal-access=permit
+            </argLine>
+            <runOrder>random</runOrder>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${maven-install-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${maven-resources-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- Note: http://jira.codehaus.org/browse/MSOURCES-45, http://jira.codehaus.org/browse/MSOURCES-50 -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <configuration>
+            <useSystemClassLoader>false</useSystemClassLoader>
+            <!-- Use a new forked process for each test See https://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html -->
+            <forkCount>1</forkCount>
+            <reuseForks>false</reuseForks>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <!-- use default JVM settings <argLine>-Xmx256m</argLine> -->
+            <runOrder>random</runOrder>
+            <argLine>
+              --illegal-access=permit
+            </argLine>
+
+            <includes>
+              <!-- include regular unit tests -->
+              <include>**/*Test.java</include>
+            </includes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${maven-release-plugin.version}</version>
+          <configuration>
+            <goals>deploy</goals>
+            <preparationGoals>install</preparationGoals>
+            <resume>false</resume>
+            <useReleaseProfile>true</useReleaseProfile>
+            <releaseProfiles>release</releaseProfiles>
+            <tagNameFormat>${project.artifactId}-@{project.version}</tagNameFormat>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${maven-source-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- run integration tests (*IT) during verify -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- automatically used by the release plugin -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[${minimumMavenVersion},)</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[${jdkLevel},)</version>
+                </requireJavaVersion>
+                <requirePluginVersions>
+                  <message>Best Practice is to always define plugin versions!
+                  </message>
+                </requirePluginVersions>
+                <requireReleaseDeps>
+                  <message>No Snapshot dependencies allowed!</message>
+                </requireReleaseDeps>
+              </rules>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                  <goal>test-jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
