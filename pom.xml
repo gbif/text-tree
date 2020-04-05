@@ -342,8 +342,8 @@
                   <version>[${jdkLevel},)</version>
                 </requireJavaVersion>
                 <requirePluginVersions>
-                  <message>Best Practice is to always define plugin versions!
-                  </message>
+                  <message>Best Practice is to always define plugin versions!</message>
+                  <unCheckedPluginList>org.apache.maven.plugins:maven-site-plugin,org.apache.maven.plugins:maven-javadoc-plugin,org.apache.maven.plugins:maven-deploy-plugin,org.apache.maven.plugins:maven-enforcer-plugin,org.apache.maven.plugins:maven-idea-plugin</unCheckedPluginList>
                 </requirePluginVersions>
                 <requireReleaseDeps>
                   <message>No Snapshot dependencies allowed!</message>
