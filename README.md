@@ -21,7 +21,7 @@ Pinales [order]
       Abies balsamea (L.) Mill. [species]
 ```
 
-Synonyms are represented as direct, nested children that are prefixed by a '*' asterisk.
+Synonyms are represented as direct, nested children that are prefixed by a `*` asterisk.
 ```
 Pinales [order]
   Pinaceae Spreng. [family]
@@ -32,9 +32,9 @@ Pinales [order]
         *$Pinus balsamea L.
 ```
  
-Basionyms can also be marked by prefixing the name with an additional '$' dollar symbol as in the 'Pinus balsamea' example above.
+Basionyms can also be marked by prefixing the name with an additional `$` dollar symbol as in the `Pinus balsamea` example above.
 
-Comments can be given after each name starting with a '#' symbol:
+Comments can be given after each name starting with a `#` symbol:
 ```
 Pinales [order]
   Pinaceae Spreng. [family]
@@ -53,5 +53,5 @@ The Java code provided allows to parse and print text trees. The [Tree class](sr
  2) A parsed tree which uses the [GBIF Name Parser](https://github.com/gbif/name-parser) to parse each name and provide in addition to the rank and name string
     also a ParsedName instance.
     
-The Tree class also offers a simple 'verify' method that checks if the given tree data is parsable. 
+The Tree class also offers a simple `verify` method that checks if the given tree data is parsable. 
 When parsing badly formatted trees the parser on purpose fails and does not try to read the remaining bits.
