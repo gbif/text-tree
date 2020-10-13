@@ -25,7 +25,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- dependency versions -->
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <logback.version>1.2.3</logback.version>
     <name-parser.version>3.5.0</name-parser.version>
     <slf4j.version>1.7.30</slf4j.version>
