@@ -34,6 +34,14 @@ Pinales [order]
  
 Basionyms can also be marked by prefixing the name with an additional `$` dollar symbol as in the `Pinus balsamea` example above.
 
+Additional semi structured information can be given as key value pairs in curly brackets. 
+Keys must be all upper case and are delimited with the value by the equality sign. Multiple values can be delimited by a comma.
+Values should therefore not contain the reserved characters '=' and ','
+
+```
+  Abies alba Mill. [genus] {PUB=Miller2019 ENV=terrestrial,marine REF=Döring2021,Banki2022 VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik}
+```
+
 Comments can be given after each name starting with a `#` symbol:
 ```
 Pinales [order]
@@ -53,5 +61,4 @@ The Java code provided allows to parse and print text trees. The [Tree class](sr
  2) A parsed tree which uses the [GBIF Name Parser](https://github.com/gbif/name-parser) to parse each name and provide in addition to the rank and name string
     also a ParsedName instance.
     
-The Tree class also offers a simple `verify` method that checks if the given tree data is parsable. 
 When parsing badly formatted trees the parser on purpose fails and does not try to read the remaining bits.

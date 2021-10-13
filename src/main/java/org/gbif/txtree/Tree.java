@@ -7,17 +7,14 @@ import org.gbif.nameparser.api.UnparsableNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * Simple class to keep a taxonomy of names.
@@ -36,8 +33,11 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "(\\" + BASIONYM_SYMBOL + ")?" +  // #3
       "(.+?)" +   // name & author #4
       "(?: \\[([a-z]+)])?" +  // rank #5
+      "(?: +\\{(.+)})?" +  // infos #6
       "(?: +#.*)?" +  // comments
       " *$");
+  private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
+  private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*,\\s*");
   private static final NameParserGBIF NAME_PARSER = new NameParserGBIF();
   private long count;
   private final List<T> root = new ArrayList<>();
@@ -64,40 +64,6 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   }
 
   /**
-   * Checks an input stream to make sure in advance that it is readable as a Tree instance.
-   */
-  public static boolean verify(InputStream stream) throws IOException {
-    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-    String line = br.readLine();
-    int counter = 0;
-    try {
-      while (line != null) {
-        int level = 0;
-        if (!isBlank(line)) {
-          Matcher m = LINE_PARSER.matcher(line);
-          if (m.find()) {
-            parseRank(m); // make sure we can read all ranks
-            level = m.group(1).length();
-            if (level % 2 != 0) {
-              LOG.error("Tree is not indented properly on line {}. Use 2 spaces only: {}", counter, line);
-              return false;
-            }
-          } else {
-            LOG.error("Failed to parse Tree on line {}: {}", counter, line);
-            return false;
-          }
-        }
-        line = br.readLine();
-        counter++;
-      }
-    } catch (IllegalArgumentException e) {
-      LOG.error("Failed to parse Tree on line {}: {}", counter, line, e);
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Builds a new simple tree instance by parsing the given input stream.
    *
    * @param stream the input stream to parse
@@ -114,7 +80,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * In addition to {@link #simple(InputStream) read(InputStream)} it takes an optional listener
    * that is passed the verbatim tree line instance for each processed row.
    */
-  public static Tree<SimpleTreeNode> simple(InputStream stream, @Nullable Consumer<TreeLine> listener) throws IOException {
+  public static Tree<SimpleTreeNode> simple(InputStream stream, Consumer<TreeLine> listener) throws IOException {
     return parse(stream, listener, Tree::simpleNode);
   }
 
@@ -138,12 +104,12 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * In addition to {@link #parsed(InputStream) read(InputStream)} it takes an optional listener
    * that is passed the verbatim tree line instance for each processed row.
    */
-  public static Tree<ParsedTreeNode> parsed(InputStream stream, @Nullable Consumer<TreeLine> listener) throws IOException {
+  public static Tree<ParsedTreeNode> parsed(InputStream stream, Consumer<TreeLine> listener) throws IOException {
     return parse(stream, listener, Tree::parsedNode);
   }
 
   private static <T extends TreeNode<T>> Tree<T> parse(InputStream stream,
-                                                       @Nullable Consumer<TreeLine> listener,
+                                                       Consumer<TreeLine> listener,
                                                        BiFunction<Long, Matcher, T> builder
                                                        ) throws IOException {
     Tree<T> tree = new Tree<>();
@@ -205,7 +171,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean basionym = m.group(3) != null;
     String name = m.group(4).trim();
     Rank rank = parseRank(m);
-    return new SimpleTreeNode(row, name, rank, basionym);
+    return new SimpleTreeNode(row, name, rank, basionym, parseInfos(m));
   }
 
   private static ParsedTreeNode parsedNode(long row, Matcher m) {
@@ -219,7 +185,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     } catch (UnparsableNameException e) {
       LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
     }
-    return new ParsedTreeNode(row, name, rank, pn, basionym);
+    return new ParsedTreeNode(row, name, rank, pn, basionym, parseInfos(m));
   }
 
   private static Rank parseRank(Matcher m) throws IllegalArgumentException {
@@ -227,6 +193,18 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       return Rank.valueOf(m.group(5).toUpperCase());
     }
     return Rank.UNRANKED;
+  }
+
+  private static Map<String, String[]> parseInfos(Matcher m) throws IllegalArgumentException {
+    if (m.group(6) != null) {
+      Matcher im = INFO_PARSER.matcher(m.group(6));
+      Map<String, String[]> infos = new LinkedHashMap<>();
+      while (im.find()) {
+        infos.put(im.group(1), COMMA_SPLITTER.split(im.group(2).trim()));
+      }
+      return infos;
+    }
+    return Collections.EMPTY_MAP;
   }
 
   public List<T> getRoot() {
