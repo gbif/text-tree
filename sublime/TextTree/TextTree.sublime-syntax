@@ -1,0 +1,39 @@
+%YAML 1.2
+---
+name: TextTree
+file_extensions: [txt, txtree]
+scope: source.txtree
+
+contexts:
+
+# Abies alba Mill. [genus]
+    main:
+        - match: '^ *'
+          scope: indent.txtree
+        - match: \*
+          scope: synonym.txtree
+        - match: \$
+          scope: basionym.txtree
+        - match: \b[^*$\[{]+
+          scope: name.txtree
+        - match: \[.+\]
+          scope: rank.txtree
+        - match: "#.*$"
+          scope: comment.txtree
+        - match: \{
+          push: data
+
+# {PUB=Miller2019 ENV=terrestrial,marine REF=Döring2021,Banki2022 VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik}
+    data:
+        - meta_scope: data.txtree
+        - match: "[A-Z]+(?==)"
+          scope: datakey.txtree
+        - match: =
+          scope: dataequal.txtree
+        - match: "(?<=[=,])[^,=}]+(?=[ ,}])"
+          scope: datavalue.txtree
+        - match: \,
+          scope: datadelim.txtree
+        - match: \}
+          pop: true
+

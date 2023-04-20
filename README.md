@@ -1,6 +1,8 @@
 # TextTree format
 
 TextTree is a simple format to represent taxonomic trees using indented, plain text.
+It is recommended to use the file extension `.txt` or `.txtree`.
+
 Each row in a TextTree represent a scientific name. 
 Each name can include the authorship and should be given a rank following the name in angular brackets:
 
@@ -62,3 +64,13 @@ The Java code provided allows to parse and print text trees. The [Tree class](sr
     also a ParsedName instance.
     
 When parsing badly formatted trees the parser on purpose fails and does not try to read the remaining bits.
+
+
+## Sublime editor syntax highlighting
+We provide a [TextTree sublime package](sublime/TextTree/TextTree.sublime-syntax) that defines the syntax highlighting for the superb [Sublime Text](https://www.sublimetext.com) editor.
+To use it simply copy the folder [TextTree](sublime/TextTree) into your sublime package folder, e.g. ```/Users/YOUR_NAME/Library/Application\ Support/Sublime\ Text\ 3/Packages``` on most Macs.
+Or chose `Settings -> Browse Packages...` to let Sublime take you to your package folder.
+
+![](sublime/Screenshot1.png)
+
+![](sublime/Screenshot2.png)
