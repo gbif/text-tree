@@ -6,7 +6,6 @@ scope: source.txtree
 
 contexts:
 
-# Abies alba Mill. [genus]
     main:
         - match: '^ *'
           scope: indent.txtree
@@ -23,7 +22,6 @@ contexts:
         - match: \{
           push: data
 
-# {PUB=Miller2019 ENV=terrestrial,marine REF=Döring2021,Banki2022 VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik}
     data:
         - meta_scope: data.txtree
         - match: "[A-Z]+(?==)"
