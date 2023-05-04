@@ -35,6 +35,8 @@ contexts:
           set: data
         - match: \#
           set: comment
+        - match: $
+          pop: true
 
     rank:
         - meta_scope: rank.txtree
