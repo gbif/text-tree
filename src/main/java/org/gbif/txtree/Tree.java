@@ -1,5 +1,6 @@
 package org.gbif.txtree;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gbif.nameparser.NameParserGBIF;
 import org.gbif.nameparser.api.ParsedName;
 import org.gbif.nameparser.api.Rank;
@@ -165,6 +166,56 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       row++;
     }
     return tree;
+  }
+
+  /**
+   * Verifies that the given input stream contains a valid text tree.
+   * Especially useful for verifying that the tree is properly indented.
+   * @param stream tree input
+   * @return true if the input stream contains a valid text tree
+   */
+  public static boolean verify(InputStream stream) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+    String line = br.readLine();
+    int counter = 0;
+    try {
+      int max = 0;
+      int last = 0;
+      while (line != null) {
+        if (!StringUtils.isBlank(line)) {
+          Matcher m = LINE_PARSER.matcher(line);
+          if (m.find()) {
+            parseRank(m); // make sure we can read all ranks
+            int level = m.group(1).length();
+            max = Math.max(max, level);
+            if (level % 2 != 0) {
+              LOG.error("Tree is not indented properly on line {}. Use 2 spaces only: {}", counter, line);
+              return false;
+            }
+            if (level-last>2) {
+              LOG.error("Tree is indented too much on line {}. Use 2 spaces only: {}", counter, line);
+              return false;
+            }
+            last = level;
+          } else {
+            LOG.error("Failed to parse Tree on line {}: {}", counter, line);
+            return false;
+          }
+        }
+        line = br.readLine();
+        counter++;
+      }
+      if (max==0 && counter > 10) {
+        LOG.error("Tree is not indented at all");
+        return false;
+      }
+
+    } catch (IllegalArgumentException e) {
+      LOG.error("Failed to parse Tree on line {}: {}", counter, line, e);
+      return false;
+    }
+    // should we require some other level than just 0???
+    return true;
   }
 
   private static SimpleTreeNode simpleNode(long row, Matcher m) {
