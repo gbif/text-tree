@@ -205,7 +205,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
         line = br.readLine();
         counter++;
       }
-      if (max==0 && counter > 10) {
+      if (max==0 && counter > 8) {
         LOG.error("Tree is not indented at all");
         return false;
       }

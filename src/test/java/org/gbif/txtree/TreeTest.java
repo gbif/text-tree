@@ -1,5 +1,6 @@
 package org.gbif.txtree;
 
+import com.google.common.io.Resources;
 import org.apache.commons.io.IOUtils;
 import org.gbif.nameparser.api.Rank;
 import org.junit.Test;
@@ -7,8 +8,8 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 
 public class TreeTest {
@@ -68,6 +69,16 @@ public class TreeTest {
       assertNotNull(n.parsedName);
       System.out.println(n.parsedName.canonicalNameComplete()+"\n");
     }
+  }
+
+  @Test
+  public void testVerify() throws Exception {
+    assertTrue(Tree.verify(resource("test.txt")));
+    assertTrue(Tree.verify(resource("test2.txt")));
+
+    assertFalse(Tree.verify(resource("badtree.txt")));
+    assertFalse(Tree.verify(resource("notree.txt")));
+    assertFalse(Tree.verify(resource("notree2.txt")));
   }
 
   @Test
