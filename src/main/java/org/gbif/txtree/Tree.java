@@ -273,18 +273,22 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   /**
    * Prints the tree into a given output stream using UTF8.
+   * The stream remains open and must be closed by the caller.
    */
   public void print(OutputStream out) throws IOException {
     Writer w = new OutputStreamWriter(out, StandardCharsets.UTF_8);
     print(w);
+    w.flush();
   }
 
   /**
    * Prints the tree into a new UTF8 encoded text file.
    */
   public void print(File f) throws IOException {
-    Writer w = new FileWriter(f, StandardCharsets.UTF_8);
-    print(w);
+    try (Writer w = new FileWriter(f, StandardCharsets.UTF_8)) {
+      print(w);
+      w.flush();
+    }
   }
 
   /**
