@@ -57,7 +57,7 @@ abstract class TreeNode<T extends TreeNode<T>> {
       out.append(Tree.BASIONYM_SYMBOL);
     }
     out.append(name);
-    if (rank != Rank.UNRANKED) {
+    if (rank != null && rank != Rank.UNRANKED) {
       out.append(" [");
       out.append(rank.name().toLowerCase());
       out.append("]");
