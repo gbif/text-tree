@@ -65,7 +65,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   }
 
   /**
-   * Builds a new simple tree instance by parsing the given input stream.
+   * Builds a new simple tree instance by parsing the given UTF8 input stream.
    *
    * @param stream the input stream to parse
    * @return the new tree instance
@@ -77,16 +77,20 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   }
 
   /**
-   * Builds a new simple tree instance by parsing the given input stream.
+   * Builds a new simple tree instance by parsing the given UTF8 input stream.
    * In addition to {@link #simple(InputStream) read(InputStream)} it takes an optional listener
    * that is passed the verbatim tree line instance for each processed row.
    */
   public static Tree<SimpleTreeNode> simple(InputStream stream, Consumer<TreeLine> listener) throws IOException {
-    return parse(stream, listener, Tree::simpleNode);
+    return parse(new InputStreamReader(stream, StandardCharsets.UTF_8), listener, Tree::simpleNode);
+  }
+
+  public static Tree<SimpleTreeNode> simple(Reader reader) throws IOException {
+    return parse(reader, null, Tree::simpleNode);
   }
 
   /**
-   * Builds a new parsed tree instance by parsing the given input stream
+   * Builds a new parsed tree instance by parsing the given UTF8 input stream
    * and using the GBIF name parser to create parsed names.
    *
    * @param stream the input stream to parse
@@ -98,25 +102,29 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     return parsed(stream, null);
   }
 
+  public static Tree<ParsedTreeNode> parsed(Reader reader) throws IOException {
+    return parse(reader, null, Tree::parsedNode);
+  }
+
   /**
-   * Builds a new parsed tree instance by parsing the given input stream
+   * Builds a new parsed tree instance by parsing the given UTF8 input stream
    * and using the GBIF name parser to create parsed names.
    *
    * In addition to {@link #parsed(InputStream) read(InputStream)} it takes an optional listener
    * that is passed the verbatim tree line instance for each processed row.
    */
   public static Tree<ParsedTreeNode> parsed(InputStream stream, Consumer<TreeLine> listener) throws IOException {
-    return parse(stream, listener, Tree::parsedNode);
+    return parse(new InputStreamReader(stream, StandardCharsets.UTF_8), listener, Tree::parsedNode);
   }
 
-  private static <T extends TreeNode<T>> Tree<T> parse(InputStream stream,
+  private static <T extends TreeNode<T>> Tree<T> parse(Reader reader,
                                                        Consumer<TreeLine> listener,
                                                        BiFunction<Long, Matcher, T> builder
                                                        ) throws IOException {
     Tree<T> tree = new Tree<>();
     LinkedList<T> parents = new LinkedList<>();
 
-    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+    BufferedReader br = new BufferedReader(reader);
     long row = 1;
     String line = br.readLine();
     while (line != null) {
@@ -175,7 +183,17 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * @return true if the input stream contains a valid text tree
    */
   public static boolean verify(InputStream stream) throws IOException {
-    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+    return verify(new InputStreamReader(stream, StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Verifies that the given input stream contains a valid text tree.
+   * Especially useful for verifying that the tree is properly indented.
+   * @param reader tree input
+   * @return true if the input stream contains a valid text tree
+   */
+  public static boolean verify(Reader reader) throws IOException {
+    var br = new BufferedReader(reader);
     String line = br.readLine();
     int counter = 0;
     try {
