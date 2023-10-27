@@ -44,14 +44,14 @@ Values should therefore not contain the reserved characters '=' and ','
   Abies alba Mill. [genus] {PUB=Miller2019 ENV=terrestrial,marine REF=Döring2021,Banki2022 VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik}
 ```
 
-Comments can be given after each name starting with a `#` symbol:
+Comments can be given after each name or the dynamic info starting with a `#` symbol:
 ```
 Pinales [order]
   Pinaceae Spreng. [family]
     Abies [genus]
       Abies alba Mill. [species]
         *Pinus picea L. [species]
-      Abies balsamea (L.) Mill. [species]
+      Abies balsamea (L.) Mill. [species] {PUB=Miller2019}  # need to verify the reference
         *$Pinus balsamea L. [species]   # this is the basionym of A. balsamea 
 ```
 
