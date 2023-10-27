@@ -16,8 +16,8 @@ public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
     this.parsedName = parsedName;
   }
 
-  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName, boolean isBasionym, Map<String, String[]> infos) {
-    super(id, name, rank, isBasionym, infos);
+  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName, boolean isBasionym, Map<String, String[]> infos, String comment) {
+    super(id, name, rank, isBasionym, infos, comment);
     this.parsedName = parsedName;
   }
 }

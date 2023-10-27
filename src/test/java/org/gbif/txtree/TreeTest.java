@@ -52,6 +52,25 @@ public class TreeTest {
   }
 
   @Test
+  public void comments() throws Exception {
+    Tree<SimpleTreeNode> tree = Tree.simple(resource("test4comments.txt"));
+
+    tree.print(System.out);
+
+    for (TreeNode<SimpleTreeNode> n : tree) {
+      if (n.name.equals("Abies alba Mill.")) {
+        assertEquals("my first comment", n.comment);
+      } else if (n.name.equals("Picea")) {
+        assertEquals("2nd comment", n.comment);
+      } else if (n.name.equals("Picea alba L.")) {
+        assertEquals("I love to leave URLs as references where I found things: https://de.wikipedia.org/wiki/Titusbogen", n.comment);
+      } else {
+        assertNull(n.comment);
+      }
+    }
+  }
+
+  @Test
   public void parsed() throws Exception {
     Tree<ParsedTreeNode> tree = Tree.parsed(resource("test2.txt"));
 

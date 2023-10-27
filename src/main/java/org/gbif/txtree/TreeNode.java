@@ -19,17 +19,19 @@ abstract class TreeNode<T extends TreeNode<T>> {
   public final List<T> synonyms = new ArrayList<>();
   public final LinkedList<T> children = new LinkedList<>();
   public final Map<String, String[]> infos;
+  public final String comment;
 
   public TreeNode(long id, String name, Rank rank, boolean isBasionym) {
-    this(id, name, rank, isBasionym, null);
+    this(id, name, rank, isBasionym, null, null);
   }
 
-  public TreeNode(long id, String name, Rank rank, boolean isBasionym, Map<String, String[]> infos) {
+  public TreeNode(long id, String name, Rank rank, boolean isBasionym, Map<String, String[]> infos, String comment) {
     this.id = id;
     this.name = name;
     this.rank = rank;
     this.basionym = isBasionym;
     this.infos = infos;
+    this.comment = comment;
   }
 
   @Override

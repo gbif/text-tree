@@ -35,8 +35,8 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "(.+?)" +   // name & author #4
       "(?: \\[([a-z]+)])?" +  // rank #5
       "(?: +\\{(.+)})?" +  // infos #6
-      "(?: +#.*)?" +  // comments
-      " *$");
+      "(?:\\s+#\\s*(.*))?" +  // comments #7
+      "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
   private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*,\\s*");
   private static final NameParserGBIF NAME_PARSER = new NameParserGBIF();
@@ -240,7 +240,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean basionym = m.group(3) != null;
     String name = m.group(4).trim();
     Rank rank = parseRank(m);
-    return new SimpleTreeNode(row, name, rank, basionym, parseInfos(m));
+    return new SimpleTreeNode(row, name, rank, basionym, parseInfos(m), m.group(7));
   }
 
   private static ParsedTreeNode parsedNode(long row, Matcher m) {
@@ -254,7 +254,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     } catch (UnparsableNameException e) {
       LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
     }
-    return new ParsedTreeNode(row, name, rank, pn, basionym, parseInfos(m));
+    return new ParsedTreeNode(row, name, rank, pn, basionym, parseInfos(m), m.group(7));
   }
 
   private static Rank parseRank(Matcher m) throws IllegalArgumentException {

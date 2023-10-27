@@ -13,7 +13,7 @@ public class SimpleTreeNode extends TreeNode<SimpleTreeNode> {
     super(id, name, rank, isBasionym);
   }
 
-  public SimpleTreeNode(long id, String name, Rank rank, boolean isBasionym, Map<String, String[]> infos) {
-    super(id, name, rank, isBasionym, infos);
+  public SimpleTreeNode(long id, String name, Rank rank, boolean isBasionym, Map<String, String[]> infos, String comment) {
+    super(id, name, rank, isBasionym, infos, comment);
   }
 }
