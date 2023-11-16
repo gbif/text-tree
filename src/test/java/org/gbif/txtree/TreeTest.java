@@ -94,10 +94,12 @@ public class TreeTest {
   public void testVerify() throws Exception {
     assertTrue(Tree.verify(resource("test.txt")));
     assertTrue(Tree.verify(resource("test2.txt")));
+    assertTrue(Tree.verify(resource("test-ranks.txt")));
 
     assertFalse(Tree.verify(resource("badtree.txt")));
     assertFalse(Tree.verify(resource("notree.txt")));
     assertFalse(Tree.verify(resource("notree2.txt")));
+    assertFalse(Tree.verify(resource("dwca.txt")));
   }
 
   @Test

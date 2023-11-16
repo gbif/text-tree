@@ -28,13 +28,14 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   public static final String SYNONYM_SYMBOL = "*";
   public static final String BASIONYM_SYMBOL = "$";
   private static final Logger LOG = LoggerFactory.getLogger(Tree.class);
+  private static final String ANY_CHAR = "[^\t\n\r]";
   private static final Pattern LINE_PARSER = Pattern.compile("^" +
-      "( *)" +  // indent #1
+      "((?:  )*)" +  // indent #1
       "(\\" + SYNONYM_SYMBOL + ")?" +  // #2
       "(\\" + BASIONYM_SYMBOL + ")?" +  // #3
-      "(.+?)" +   // name & author #4
-      "(?: \\[([a-z]+)])?" +  // rank #5
-      "(?: +\\{(.+)})?" +  // infos #6
+      "("+ANY_CHAR+"+?)" +   // name & author #4
+      "(?: \\[([a-z _-]+)])?" +  // rank #5
+      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #6
       "(?:\\s+#\\s*(.*))?" +  // comments #7
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
@@ -253,13 +254,15 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       pn = NAME_PARSER.parse(name, rank, null);
     } catch (UnparsableNameException e) {
       LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e); // not great, but dont want to expose the exception
     }
     return new ParsedTreeNode(row, name, rank, pn, basionym, parseInfos(m), m.group(7));
   }
 
   private static Rank parseRank(Matcher m) throws IllegalArgumentException {
     if (m.group(5) != null) {
-      return Rank.valueOf(m.group(5).toUpperCase());
+      return Rank.valueOf(m.group(5).trim().toUpperCase().replace(' ', '_'));
     }
     return Rank.UNRANKED;
   }
