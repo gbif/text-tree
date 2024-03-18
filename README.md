@@ -23,18 +23,46 @@ Pinales [order]
       Abies balsamea (L.) Mill. [species]
 ```
 
-Synonyms are represented as direct, nested children that are prefixed by a `*` asterisk.
+Synonyms are represented as direct, nested children that are prefixed by a `=` or `≡` 
+if they are homotypic to the name directly above.
 ```
 Pinales [order]
   Pinaceae Spreng. [family]
     Abies [genus]
       Abies alba Mill. [species]
-        *Pinus picea L.
+        =Pinus picea L.
       Abies balsamea (L.) Mill. [species]
-        *$Pinus balsamea L.
+        ≡$Pinus balsamea L.
 ```
  
 Basionyms can also be marked by prefixing the name with an additional `$` dollar symbol as in the `Pinus balsamea` example above.
+
+This allows for rather rich synonymies being expressed:
+```
+Agoseris apargioides (Less.) Greene [species]
+  ≡$Troximon apargioides Less. [species]
+  ≡Barkhausia lessingii Hook. & Arn. [species]
+  ≡Stylopappus lessingii D.Dietr. [species]
+  =Macrorhynchus humilis Benth. [species]
+  ≡Troximon humilis (Benth.) A.Gray [species]
+  ≡Agoseris humilis (Benth.) Kuntze [species]
+  =Agoseris maritima E.Sheld. [species]
+  ≡Agoseris apargioides subsp. maritima (E.Sheld.) Q.Jones [subspecies]
+  ≡Agoseris apargioides var. maritima (E.Sheld.) G.I.Baird [variety]
+  =Agoseris maritima Eastw. [species]
+  ≡Agoseris eastwoodiae Fedde [species]
+  ≡Agoseris apargioides var. eastwoodiae (Fedde) Munz [variety]
+```
+
+The common convention to prefix extinct taxa with a dagger symbol is also supported:
+```
+Reptilia [class]
+  †Bolosauria [order]
+  Crocodylia [order]
+    †Crocodylus megarhinus Andrews, 1905 [species]
+      =†Crocodylus articeps Andrews, 1906 [species]
+  †Dinosauria [order]
+``` 
 
 Additional semi structured information can be given as key value pairs in curly brackets. 
 Keys must be all upper case and are delimited with the value by the equality sign. Multiple values can be delimited by a comma.

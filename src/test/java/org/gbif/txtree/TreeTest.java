@@ -52,6 +52,62 @@ public class TreeTest {
   }
 
   @Test
+  public void simpleHomotypic() throws Exception {
+    Tree<?> tree = Tree.simple(resource("homotypic.txtree"));
+
+    tree.print(System.out);
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    assertEquals(IOUtils.toString(resource("homotypic.txtree"), "UTF8").trim(), buffer.toString().trim());
+
+
+    int homotpics = 0;
+    System.out.println("Tree traversal");
+    for (TreeNode<?> n : tree) {
+      System.out.println(n.name);
+      assertNotNull(n.name);
+      assertNotNull(n.rank);
+      if (n.homotypic) homotpics++;
+    }
+    assertEquals(9, homotpics);
+  }
+
+  @Test
+  public void simpleExtinct() throws Exception {
+    Tree<?> tree = Tree.simple(resource("extinct.txtree"));
+
+    tree.print(System.out);
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    assertEquals(IOUtils.toString(resource("extinct.txtree"), "UTF8").trim(), buffer.toString().trim());
+
+    int extinct = 0;
+    System.out.println("Tree traversal");
+    for (TreeNode<?> n : tree) {
+      System.out.println(n.name);
+      assertNotNull(n.name);
+      assertNotNull(n.rank);
+      if (n.extinct) extinct++;
+    }
+    assertEquals(8, extinct);
+  }
+
+  @Test
+  public void oldStyleSynonyms() throws Exception {
+    Tree<?> tree = Tree.simple(resource("oldstyle.txtree"));
+
+    tree.print(System.out);
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    // * replaced with =
+    assertEquals(IOUtils.toString(resource("oldstyle.txtree"), "UTF8").trim()
+            .replaceAll("\\*", "="), buffer.toString().trim());
+  }
+
+  @Test
   public void comments() throws Exception {
     Tree<SimpleTreeNode> tree = Tree.simple(resource("test4comments.txt"));
 

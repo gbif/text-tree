@@ -9,10 +9,12 @@ contexts:
     main:
         - match: '^ *'
           scope: indent.txtree
-        - match: \*
+        - match: "[*=≡]"
           scope: synonym.txtree
         - match: \$
           scope: basionym.txtree
+        - match: \†
+          scope: extinct.txtree
         - match: \b[^*$\[{]+
           scope: name.txtree
         - match: \[.+\]

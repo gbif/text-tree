@@ -15,27 +15,41 @@ abstract class TreeNode<T extends TreeNode<T>> {
   public final long id;
   public final String name;
   public final Rank rank;
+  public final boolean extinct;
   public final boolean basionym;
-  public final List<T> synonyms = new ArrayList<>();
+  public final boolean homotypic;
+  public final LinkedList<T> synonyms = new LinkedList<>();
   public final LinkedList<T> children = new LinkedList<>();
   public final Map<String, String[]> infos;
   public final String comment;
 
-  public TreeNode(long id, String name, Rank rank, boolean isBasionym) {
-    this(id, name, rank, isBasionym, null, null);
+  public TreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic) {
+    this(id, name, rank, extinct, isBasionym, homotypic, null, null);
   }
 
-  public TreeNode(long id, String name, Rank rank, boolean isBasionym, Map<String, String[]> infos, String comment) {
+  public TreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
     this.id = id;
     this.name = name;
     this.rank = rank;
+    this.extinct = extinct;
     this.basionym = isBasionym;
+    this.homotypic = homotypic;
     this.infos = infos;
     this.comment = comment;
   }
 
   @Override
   public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (extinct) {
+      sb.append(Tree.EXTINCT_SYMBOL);
+    }
+    sb.append(name);
+    if (rank != null) {
+      sb.append(" [");
+      sb.append(rank .name().toLowerCase());
+      sb.append(']');
+    }
     return rank == null ?
         name :
         name + " [" + rank .name().toLowerCase() + ']';
@@ -53,10 +67,17 @@ abstract class TreeNode<T extends TreeNode<T>> {
   public void print(Appendable out, int level, boolean synonym) throws IOException {
     out.append(indent(level * 2));
     if (synonym) {
-      out.append(Tree.SYNONYM_SYMBOL);
+      if (homotypic) {
+        out.append(Tree.HOMOTYPIC_SYMBOL);
+      } else {
+        out.append(Tree.SYNONYM_SYMBOL);
+      }
     }
     if (basionym) {
       out.append(Tree.BASIONYM_SYMBOL);
+    }
+    if (extinct) {
+      out.append(Tree.EXTINCT_SYMBOL);
     }
     out.append(name);
     if (rank != null && rank != Rank.UNRANKED) {

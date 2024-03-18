@@ -31,6 +31,11 @@
             "foreground": "#E67E22" // Red
         },
         {
+            "name": "textree extinct",
+            "scope": "extinct.txtree",
+            "foreground": "#cccccc" // light grey
+        },
+        {
             "name": "textree name",
             "scope": "name.txtree",
             "foreground": "#5ebbff" // light Blue

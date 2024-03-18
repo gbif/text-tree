@@ -2,5 +2,5 @@ Pinaceae
     Abies
     Abies alba Mill.
     Abies nigra
-        *$Abies picea
+        =$Abies picea
 

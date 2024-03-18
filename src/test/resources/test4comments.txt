@@ -5,6 +5,6 @@ Pinaceae
   Picea # 2nd comment
     Picea alba L.   # I love to leave URLs as references where I found things: https://de.wikipedia.org/wiki/Titusbogen
     Picea picea
-      *$Abies picea
+      =$Abies picea
   Pinus
 

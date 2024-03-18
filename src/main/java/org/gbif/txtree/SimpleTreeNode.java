@@ -9,11 +9,15 @@ import java.util.Map;
  */
 public class SimpleTreeNode extends TreeNode<SimpleTreeNode> {
 
-  public SimpleTreeNode(long id, String name, Rank rank, boolean isBasionym) {
-    super(id, name, rank, isBasionym);
+  public SimpleTreeNode(long id, String name, Rank rank) {
+    super(id, name, rank, false, false, false);
   }
 
-  public SimpleTreeNode(long id, String name, Rank rank, boolean isBasionym, Map<String, String[]> infos, String comment) {
-    super(id, name, rank, isBasionym, infos, comment);
+  public SimpleTreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic) {
+    super(id, name, rank, extinct, isBasionym, homotypic);
+  }
+
+  public SimpleTreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
+    super(id, name, rank, extinct, isBasionym, homotypic, infos, comment);
   }
 }

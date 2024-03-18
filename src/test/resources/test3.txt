@@ -5,5 +5,5 @@ Pinaceae
   Picea
     Picea alba L.
     Picea picea
-      *$Abies picea
+      =$Abies picea
   Pinus

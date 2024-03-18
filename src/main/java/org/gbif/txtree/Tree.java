@@ -25,18 +25,22 @@ import java.util.regex.Pattern;
  * Iterating over the tree goes in
  */
 public class Tree<T extends TreeNode<T>> implements Iterable<T> {
-  public static final String SYNONYM_SYMBOL = "*";
+  public static final String SYNONYM_SYMBOL = "=";
+  public static final String HOMOTYPIC_SYMBOL = "≡";
   public static final String BASIONYM_SYMBOL = "$";
+  public static final String EXTINCT_SYMBOL = "†";
+
   private static final Logger LOG = LoggerFactory.getLogger(Tree.class);
   private static final String ANY_CHAR = "[^\t\n\r]";
   private static final Pattern LINE_PARSER = Pattern.compile("^" +
       "((?:  )*)" +  // indent #1
-      "(\\" + SYNONYM_SYMBOL + ")?" +  // #2
+      "([*" + SYNONYM_SYMBOL + HOMOTYPIC_SYMBOL + "])?" +  // #2
       "(\\" + BASIONYM_SYMBOL + ")?" +  // #3
-      "("+ANY_CHAR+"+?)" +   // name & author #4
-      "(?: \\[([a-z _-]+)])?" +  // rank #5
-      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #6
-      "(?:\\s+#\\s*(.*))?" +  // comments #7
+      "(" + EXTINCT_SYMBOL + ")?" +  // #4
+      "("+ANY_CHAR+"+?)" +   // name & author #5
+      "(?: \\[([a-z _-]+)])?" +  // rank #6
+      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #7
+      "(?:\\s+#\\s*(.*))?" +  // comments #8
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
   private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*,\\s*");
@@ -238,15 +242,19 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   }
 
   private static SimpleTreeNode simpleNode(long row, Matcher m) {
+    boolean homotypic = Objects.equals(m.group(2), HOMOTYPIC_SYMBOL);
     boolean basionym = m.group(3) != null;
-    String name = m.group(4).trim();
+    boolean extinct = m.group(4) != null;
+    String name = m.group(5).trim();
     Rank rank = parseRank(m);
-    return new SimpleTreeNode(row, name, rank, basionym, parseInfos(m), m.group(7));
+    return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, parseInfos(m), m.group(8));
   }
 
   private static ParsedTreeNode parsedNode(long row, Matcher m) {
+    boolean homotypic = Objects.equals(m.group(2), HOMOTYPIC_SYMBOL);
     boolean basionym = m.group(3) != null;
-    String name = m.group(4).trim();
+    boolean extinct = m.group(4) != null;
+    String name = m.group(5).trim();
     Rank rank = parseRank(m);
 
     ParsedName pn = null;
@@ -257,19 +265,19 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     } catch (InterruptedException e) {
       throw new RuntimeException(e); // not great, but dont want to expose the exception
     }
-    return new ParsedTreeNode(row, name, rank, pn, basionym, parseInfos(m), m.group(7));
+    return new ParsedTreeNode(row, name, rank, pn, extinct, basionym, homotypic, parseInfos(m), m.group(8));
   }
 
   private static Rank parseRank(Matcher m) throws IllegalArgumentException {
-    if (m.group(5) != null) {
-      return Rank.valueOf(m.group(5).trim().toUpperCase().replace(' ', '_'));
+    if (m.group(6) != null) {
+      return Rank.valueOf(m.group(6).trim().toUpperCase().replace(' ', '_'));
     }
     return Rank.UNRANKED;
   }
 
   private static Map<String, String[]> parseInfos(Matcher m) throws IllegalArgumentException {
-    if (m.group(6) != null) {
-      Matcher im = INFO_PARSER.matcher(m.group(6));
+    if (m.group(7) != null) {
+      Matcher im = INFO_PARSER.matcher(m.group(7));
       Map<String, String[]> infos = new LinkedHashMap<>();
       while (im.find()) {
         infos.put(im.group(1), COMMA_SPLITTER.split(im.group(2).trim()));

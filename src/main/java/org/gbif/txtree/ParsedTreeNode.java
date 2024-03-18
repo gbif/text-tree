@@ -11,13 +11,18 @@ import java.util.Map;
 public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
   public final ParsedName parsedName;
 
-  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName, boolean isBasionym) {
-    super(id, name, rank, isBasionym);
+  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName) {
+    super(id, name, rank, false, false, false);
     this.parsedName = parsedName;
   }
 
-  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName, boolean isBasionym, Map<String, String[]> infos, String comment) {
-    super(id, name, rank, isBasionym, infos, comment);
+  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName, boolean extinct, boolean isBasionym, boolean homotypic) {
+    super(id, name, rank, extinct, isBasionym, homotypic);
+    this.parsedName = parsedName;
+  }
+
+  public ParsedTreeNode(long id, String name, Rank rank, ParsedName parsedName, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
+    super(id, name, rank, extinct, isBasionym, homotypic, infos, comment);
     this.parsedName = parsedName;
   }
 }
