@@ -1,6 +1,5 @@
 package org.gbif.txtree;
 
-import com.google.common.io.Resources;
 import org.apache.commons.io.IOUtils;
 import org.gbif.nameparser.api.Rank;
 import org.junit.Test;
@@ -9,14 +8,31 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
 
 
 public class TreeTest {
 
   @Test
+  public void simpleWithRanks() throws Exception {
+    var tree = Tree.simple(resource("badranks.txtree"));
+
+    tree.print(System.out);
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    assertEquals(buffer.toString().trim(), IOUtils.toString(resource("badranks.txtree"), "UTF8").trim());
+
+
+    System.out.println("Tree traversal");
+    for (var n : tree) {
+      assertNotNull(n.name);
+      assertNotNull(n.rank);
+    }
+  }
+
+  @Test
   public void simple() throws Exception {
-    Tree<?> tree = Tree.simple(resource("test.txt"));
+    var tree = Tree.simple(resource("test.txt"));
 
     tree.print(System.out);
 
@@ -26,15 +42,15 @@ public class TreeTest {
 
 
     System.out.println("Tree traversal");
-    for (TreeNode<?> n : tree) {
+    for (var n : tree) {
       assertNotNull(n.name);
-      assertEquals(Rank.UNRANKED, n.rank);
+      assertNull(n.rank);
     }
   }
 
   @Test
   public void simple2() throws Exception {
-    Tree<?> tree = Tree.simple(resource("test2.txt"));
+    var tree = Tree.simple(resource("test2.txt"));
 
     tree.print(System.out);
 
@@ -44,16 +60,18 @@ public class TreeTest {
 
 
     System.out.println("Tree traversal");
-    for (TreeNode<?> n : tree) {
+    for (var n : tree) {
       System.out.println(n.name);
       assertNotNull(n.name);
-      assertNotNull(n.rank);
+      if (!n.name.startsWith("?")) {
+        assertNotNull(n.rank);
+      }
     }
   }
 
   @Test
   public void simpleHomotypic() throws Exception {
-    Tree<?> tree = Tree.simple(resource("homotypic.txtree"));
+    var tree = Tree.simple(resource("homotypic.txtree"));
 
     tree.print(System.out);
 
@@ -64,7 +82,7 @@ public class TreeTest {
 
     int homotpics = 0;
     System.out.println("Tree traversal");
-    for (TreeNode<?> n : tree) {
+    for (var n : tree) {
       System.out.println(n.name);
       assertNotNull(n.name);
       assertNotNull(n.rank);
@@ -75,7 +93,7 @@ public class TreeTest {
 
   @Test
   public void simpleExtinct() throws Exception {
-    Tree<?> tree = Tree.simple(resource("extinct.txtree"));
+    var tree = Tree.simple(resource("extinct.txtree"));
 
     tree.print(System.out);
 
@@ -85,7 +103,7 @@ public class TreeTest {
 
     int extinct = 0;
     System.out.println("Tree traversal");
-    for (TreeNode<?> n : tree) {
+    for (var n : tree) {
       System.out.println(n.name);
       assertNotNull(n.name);
       assertNotNull(n.rank);
@@ -96,7 +114,7 @@ public class TreeTest {
 
   @Test
   public void oldStyleSynonyms() throws Exception {
-    Tree<?> tree = Tree.simple(resource("oldstyle.txtree"));
+    var tree = Tree.simple(resource("oldstyle.txtree"));
 
     tree.print(System.out);
 
@@ -140,7 +158,9 @@ public class TreeTest {
     for (ParsedTreeNode n : tree) {
       System.out.println(n.name);
       assertNotNull(n.name);
-      assertNotNull(n.rank);
+      if (!n.name.startsWith("?")) {
+        assertNotNull(n.rank);
+      }
       assertNotNull(n.parsedName);
       System.out.println(n.parsedName.canonicalNameComplete()+"\n");
     }
@@ -160,7 +180,7 @@ public class TreeTest {
 
   @Test
   public void infos() throws Exception {
-    Tree<?> tree = Tree.simple(resource("test3.txt"));
+    var tree = Tree.simple(resource("test3.txt"));
 
     tree.print(System.out);
 
@@ -169,7 +189,7 @@ public class TreeTest {
     assertEquals(IOUtils.toString(resource("test3clean.txt"), "UTF8").trim(), buffer.toString().trim());
 
     System.out.println("Tree traversal");
-    for (TreeNode<?> n : tree) {
+    for (var n : tree) {
       assertNotNull(n.name);
     }
   }

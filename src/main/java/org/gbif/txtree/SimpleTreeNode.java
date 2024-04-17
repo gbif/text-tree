@@ -1,23 +1,21 @@
 package org.gbif.txtree;
 
-import org.gbif.nameparser.api.Rank;
-
 import java.util.Map;
 
 /**
- * Simple bean for representing a node in a taxonomic tree.
+ * Represents a node in a taxonomic tree using mostly strings.
  */
 public class SimpleTreeNode extends TreeNode<SimpleTreeNode> {
 
-  public SimpleTreeNode(long id, String name, Rank rank) {
+  public SimpleTreeNode(long id, String name, String rank) {
     super(id, name, rank, false, false, false);
   }
 
-  public SimpleTreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic) {
+  public SimpleTreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic) {
     super(id, name, rank, extinct, isBasionym, homotypic);
   }
 
-  public SimpleTreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
+  public SimpleTreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
     super(id, name, rank, extinct, isBasionym, homotypic, infos, comment);
   }
 }

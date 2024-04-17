@@ -208,7 +208,6 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
         if (!StringUtils.isBlank(line)) {
           Matcher m = LINE_PARSER.matcher(line);
           if (m.find()) {
-            parseRank(m); // make sure we can read all ranks
             int level = m.group(1).length();
             max = Math.max(max, level);
             if (level % 2 != 0) {
@@ -246,7 +245,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean basionym = m.group(3) != null;
     boolean extinct = m.group(4) != null;
     String name = m.group(5).trim();
-    Rank rank = parseRank(m);
+    String rank = StringUtils.trimToNull(m.group(6));
     return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, parseInfos(m), m.group(8));
   }
 
@@ -255,24 +254,22 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean basionym = m.group(3) != null;
     boolean extinct = m.group(4) != null;
     String name = m.group(5).trim();
-    Rank rank = parseRank(m);
+    Rank rank = null;
+    String vrank = StringUtils.trimToNull(m.group(6));
+    if (vrank != null) {
+      rank = Rank.valueOf(vrank.toUpperCase().replace(' ', '_'));
+    }
 
     ParsedName pn = null;
     try {
       pn = NAME_PARSER.parse(name, rank, null);
+      pn.setRank(rank); // make sure to keep the original rank
     } catch (UnparsableNameException e) {
       LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
     } catch (InterruptedException e) {
       throw new RuntimeException(e); // not great, but dont want to expose the exception
     }
-    return new ParsedTreeNode(row, name, rank, pn, extinct, basionym, homotypic, parseInfos(m), m.group(8));
-  }
-
-  private static Rank parseRank(Matcher m) throws IllegalArgumentException {
-    if (m.group(6) != null) {
-      return Rank.valueOf(m.group(6).trim().toUpperCase().replace(' ', '_'));
-    }
-    return Rank.UNRANKED;
+    return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, parseInfos(m), m.group(8));
   }
 
   private static Map<String, String[]> parseInfos(Matcher m) throws IllegalArgumentException {

@@ -14,7 +14,7 @@ import java.util.Map;
 abstract class TreeNode<T extends TreeNode<T>> {
   public final long id;
   public final String name;
-  public final Rank rank;
+  public final String rank;
   public final boolean extinct;
   public final boolean basionym;
   public final boolean homotypic;
@@ -23,11 +23,11 @@ abstract class TreeNode<T extends TreeNode<T>> {
   public final Map<String, String[]> infos;
   public final String comment;
 
-  public TreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic) {
+  public TreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic) {
     this(id, name, rank, extinct, isBasionym, homotypic, null, null);
   }
 
-  public TreeNode(long id, String name, Rank rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
+  public TreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
     this.id = id;
     this.name = name;
     this.rank = rank;
@@ -47,12 +47,10 @@ abstract class TreeNode<T extends TreeNode<T>> {
     sb.append(name);
     if (rank != null) {
       sb.append(" [");
-      sb.append(rank .name().toLowerCase());
+      sb.append(rank);
       sb.append(']');
     }
-    return rank == null ?
-        name :
-        name + " [" + rank .name().toLowerCase() + ']';
+    return sb.toString();
   }
 
   // to avoid dependency on apache or guava
@@ -80,9 +78,9 @@ abstract class TreeNode<T extends TreeNode<T>> {
       out.append(Tree.EXTINCT_SYMBOL);
     }
     out.append(name);
-    if (rank != null && rank != Rank.UNRANKED) {
+    if (rank != null) {
       out.append(" [");
-      out.append(rank.name().toLowerCase());
+      out.append(rank);
       out.append("]");
     }
     if (infos != null && !infos.isEmpty()) {
