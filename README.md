@@ -94,8 +94,20 @@ The Java code provided allows to parse and print text trees. The [Tree class](sr
 When parsing badly formatted trees the parser on purpose fails and does not try to read the remaining bits.
 
 
+## Visual Studio Code Extension
+We provide an extension for VS Code to do syntax highlighting.
+It is available in the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=GBIF.texttree).
+To install simply search the marketplace for the extension `TextTree`.
+
+When installed files with the a file suffix `.txtree` and `.tree` should automatically make use of it.
+Please make sure to also switch your color theme in your settings to the bundled `TextTree` theme.
+
+
+![](vscode/screenshot.png)
+
+
 ## Sublime syntax highlighting
-We provide a [TextTree sublime package](sublime/TextTree/TextTree.sublime-syntax) that defines the syntax highlighting for the superb [Sublime Text](https://www.sublimetext.com) editor.
+We also provide a [TextTree sublime package](sublime/TextTree/TextTree.sublime-syntax) that defines the syntax highlighting for the [Sublime Text](https://www.sublimetext.com) editor.
 To use it simply copy the folder [TextTree](sublime/TextTree) into your sublime package folder, e.g. ```/Users/YOUR_NAME/Library/Application\ Support/Sublime\ Text\ 3/Packages``` on most Macs.
 Or chose `Settings -> Browse Packages...` to let Sublime take you to your package folder.
 
@@ -104,10 +116,3 @@ Or chose `Settings -> Browse Packages...` to let Sublime take you to your packag
 ![](sublime/Screenshot1.png)
 
 
-## Visual Studio Code Extension
-We also provide an extension for VS Code which does the same syntax highlighting as the Sublime plugin.
-It is available in the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=GBIF.texttree).
-
-To install simply search the marketplace for the extension `TextTree`.
-
-![](vscode/screenshot.png)
