@@ -102,3 +102,12 @@ Or chose `Settings -> Browse Packages...` to let Sublime take you to your packag
 ![](sublime/Screenshot2.png)
 
 ![](sublime/Screenshot1.png)
+
+
+## Visual Studio Code Extension
+We also provide an extension for VS Code which does the same syntax highlighting as the Sublime plugin.
+It is available in the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=GBIF.texttree).
+
+To install simply search the marketplace for the extension `TextTree`.
+
+![](vscode/screenshot.png)

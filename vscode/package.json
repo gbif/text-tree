@@ -10,7 +10,11 @@
     "Formatters"
   ],
   "keywords": [
-    "taxonomy", "tree", "gbif", "col", "data"
+    "taxonomy",
+    "tree",
+    "gbif",
+    "col",
+    "data"
   ],
   "pricing": "Free",
   "publisher": "GBIF",
@@ -51,8 +55,5 @@
   },
   "scripts": {
     "install": "cp -R * ~/.vscode/extensions/texttree"
-  },
-  "devDependencies": {
-    "esbuild": "^0.20.2"
   }
 }
