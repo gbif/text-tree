@@ -1,0 +1,58 @@
+{
+  "name": "texttree",
+  "displayName": "TextTree",
+  "description": "Syntax highlighing for TextTree files - a simple format to represent taxonomic trees using indented, plain text.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "keywords": [
+    "taxonomy", "tree", "gbif", "col", "data"
+  ],
+  "pricing": "Free",
+  "publisher": "GBIF",
+  "contributes": {
+    "languages": [
+      {
+        "id": "texttree",
+        "aliases": [
+          "TextTree",
+          "TxTree"
+        ],
+        "extensions": [
+          ".txtree",
+          ".txt",
+          ".tree"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "texttree",
+        "scopeName": "text.txtree",
+        "path": "./syntaxes/.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "TextTree",
+        "uiTheme": "vs-dark",
+        "path": "./themes/texttree-color-theme.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gbif/text-tree.git"
+  },
+  "scripts": {
+    "install": "cp -R * ~/.vscode/extensions/texttree"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.2"
+  }
+}

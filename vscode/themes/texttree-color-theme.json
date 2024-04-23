@@ -1,0 +1,111 @@
+{
+	"name": "TTree",
+	"colors": {
+		"editor.background": "#10141C",
+		"editor.foreground": "#A8A8A8",
+		"activityBarBadge.background": "#007acc",
+		"sideBarTitle.foreground": "#bbbbbb"
+	},
+	"tokenColors": [
+		{
+			"name": "Indent",
+			"scope": [
+				"indent.txtree"
+			],
+			"settings": {
+			}
+		},
+		{
+			"name": "Comment",
+			"scope": [
+				"comment",
+				"comment.txtree"
+			],
+			"settings": {
+				"fontStyle": "italic",
+				"foreground": "#777777"
+			}
+		},
+		{
+			"name": "Synonym",
+			"scope": [
+				"synonym.txtree"
+			],
+			"settings": {
+				"foreground": "#F1C40F"
+			}
+		},
+		{
+			"name": "Basionym",
+			"scope": [
+				"basionym.txtree"
+			],
+			"settings": {
+				"foreground": "#E67E22"
+			}
+		},
+		{
+			"name": "Extinct",
+			"scope": [
+				"extinct.txtree"
+			],
+			"settings": {
+				"foreground": "#CCCCCC"
+			}
+		},
+		{
+			"name": "Name",
+			"scope": [
+				"name.txtree"
+			],
+			"settings": {
+				"foreground": "#5ebbff"
+			}
+		},				
+		{
+			"name": "Rank",
+			"scope": [
+				"rank.txtree"
+			],
+			"settings": {
+				"foreground": "#AAD94C"
+			}
+		},		
+		{
+			"name": "Data",
+			"scope": [
+				"data.txtree"
+			],
+			"settings": {
+				"foreground": "#58D68D"
+			}
+		},		
+		{
+			"name": "DataKey",
+			"scope": [
+				"datakey.txtree"
+			],
+			"settings": {
+				"foreground": "#CD6155"
+			}
+		},		
+		{
+			"name": "DataValue",
+			"scope": [
+				"datavalue.txtree"
+			],
+			"settings": {
+				"foreground": "#145A32"
+			}
+		},										
+		{
+			"name": "DataDelim",
+			"scope": [
+				"datadelim.txtree"
+			],
+			"settings": {
+				"foreground": "#B6BCBF"
+			}
+		}
+	]
+}

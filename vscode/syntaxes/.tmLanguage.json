@@ -1,0 +1,66 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "texttree",
+	"scopeName": "text.txtree",
+	"patterns": [
+		{
+			"include": "#row"
+		}
+	],
+	"repository": {
+		"row": {
+			"patterns": [
+				{
+					"name": "synonym.txtree",
+					"match": "[*=≡]"
+				},
+				{
+					"name": "basionym.txtree",
+					"match": "\\$"
+				},
+				{
+					"name": "extinct.txtree",
+					"match": "\\†"
+				},
+				{
+					"name": "name.txtree",
+					"match": "\\b[^*$\\[{]+"
+				},
+				{
+					"name": "rank.txtree",
+					"match": "\\[.+\\]"
+				},
+				{
+					"include": "#data"
+				},
+				{
+					"name": "comment.txtree",
+					"match": "#.*$"
+				}
+			]
+		},
+		"data": {
+			"name": "data.txtree",
+			"begin": "\\{",
+			"end": "\\}",
+			"patterns": [
+				{
+					"name": "datakey.txtree",
+					"match": "[A-Z]+(?==)"
+				},
+				{
+					"name": "dataequal.txtree",
+					"match": "="
+				},
+				{
+					"name": "datavalue.txtree",
+					"match": "(?<=[=,])[^,=}]+(?=[ ,}])"
+				},
+				{
+					"name": "datadelim.txtree",
+					"match": "\\,"
+				}
+			]
+		}
+	}
+}
