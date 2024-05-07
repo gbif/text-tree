@@ -30,7 +30,7 @@ contexts:
           scope: datakey.txtree
         - match: =
           scope: dataequal.txtree
-        - match: "(?<=[=,])[^,=}]+(?=[ ,}])"
+        - match: "(?<=[=,])[^, }]+(?=[ ,}])"
           scope: datavalue.txtree
         - match: \,
           scope: datadelim.txtree

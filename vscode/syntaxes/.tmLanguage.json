@@ -54,7 +54,7 @@
 				},
 				{
 					"name": "datavalue.txtree",
-					"match": "(?<=[=,])[^,=}]+(?=[ ,}])"
+					"match": "(?<=[=,])[^, }]+(?=[ ,}])"
 				},
 				{
 					"name": "datadelim.txtree",
