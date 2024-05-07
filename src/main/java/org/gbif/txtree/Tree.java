@@ -168,7 +168,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
           }
 
           if (listener != null) {
-            TreeLine tl = new TreeLine(row, level, line.trim());
+            TreeLine tl = new TreeLine(row, level, line.trim(), n.infos);
             listener.accept(tl);
           }
         } else {
