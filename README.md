@@ -66,7 +66,7 @@ Reptilia [class]
 
 Additional semi structured information can be given as key value pairs in curly brackets. 
 Keys must be all upper case and are delimited with the value by the equality sign. Multiple values can be delimited by a comma.
-Values should therefore not contain the reserved characters '=' and ','. If needed they can be escaped by doubling them, i.e. `,,` should be used to represent a comma in the value and `,,,,` for 2 commas.
+Values should therefore not contain the reserved character ','. If needed they can be escaped by doubling them, i.e. `,,` should be used to represent a comma in the value and `,,,,` for 2 commas.
 
 ```
   Abies alba Mill. [genus] {ID=1234 PUB=Miller2019 ENV=terrestrial,marine REF=Döring2021,Banki2022 VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik}
