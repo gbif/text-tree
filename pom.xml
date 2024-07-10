@@ -5,7 +5,7 @@
 
   <groupId>org.gbif</groupId>
   <artifactId>text-tree</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.1-SNAPSHOT</version>
 
   <name>Text Tree</name>
   <description>A simple taxonomic tree format using indented plain text.</description>
@@ -15,7 +15,7 @@
     <connection>scm:git:git@github.com:gbif/text-tree.git</connection>
     <url>https://github.com/gbif/text-tree</url>
     <developerConnection>scm:git:git@github.com:gbif/text-tree.git</developerConnection>
-    <tag>text-tree-1.5.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
