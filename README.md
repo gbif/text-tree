@@ -91,6 +91,10 @@ Pinales [order]
         *$Pinus balsamea L. [species]   # this is the basionym of A. balsamea 
 ```
 
+## ChecklistBank guide
+[ChecklistBank](httpps://www.checklistbank.org) provides a small [publishing guide]([url](https://github.com/CatalogueOfLife/coldp/blob/master/docs/publishing-guide-txtree.md)) for TextTree based datasets which defines a small set of info keys and a way to share structured references.
+
+
 
 ## Java package
 The Java code provided allows to parse and print text trees. The [Tree class](src/main/java/org/gbif/txtree/Tree.java) offers 2 kind of parsed trees:
