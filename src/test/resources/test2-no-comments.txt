@@ -11,7 +11,7 @@ Plantae [kingdom]
               =Negundo aceroides Torr. [species]
               =Negundo aceroides subsp. interius (Britton) T.Love & D.Love [subspecies]
             Acer negundo var. californicum (Torr. & Gray) Sarg. [variety]
-              =$? californicum Torr. & A.Gray
+              =$californicum Torr. & A.Gray
               =Negundo aceroides var. californicum (Torr. & A.Gray) Sarg. [variety]
             Acer negundo var. negundo [variety]
             Acer negundo var. violaceum (G. Kirchn.) H. Jaeger [variety]

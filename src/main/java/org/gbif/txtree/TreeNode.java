@@ -18,22 +18,24 @@ abstract class TreeNode<T extends TreeNode<T>> {
   public final boolean extinct;
   public final boolean basionym;
   public final boolean homotypic;
+  public final boolean provisional;
   public final LinkedList<T> synonyms = new LinkedList<>();
   public final LinkedList<T> children = new LinkedList<>();
   public final Map<String, String[]> infos;
   public final String comment;
 
-  public TreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic) {
-    this(id, name, rank, extinct, isBasionym, homotypic, null, null);
+  public TreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic, boolean provisional) {
+    this(id, name, rank, extinct, isBasionym, homotypic, provisional, null, null);
   }
 
-  public TreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic, Map<String, String[]> infos, String comment) {
+  public TreeNode(long id, String name, String rank, boolean extinct, boolean isBasionym, boolean homotypic, boolean provisional, Map<String, String[]> infos, String comment) {
     this.id = id;
     this.name = name;
     this.rank = rank;
     this.extinct = extinct;
     this.basionym = isBasionym;
     this.homotypic = homotypic;
+    this.provisional = provisional;
     this.infos = infos;
     this.comment = comment;
   }
@@ -76,6 +78,9 @@ abstract class TreeNode<T extends TreeNode<T>> {
     }
     if (extinct) {
       out.append(Tree.EXTINCT_SYMBOL);
+    }
+    if (provisional) {
+      out.append(Tree.PROVISIONAL_SYMBOL);
     }
     out.append(name);
     if (rank != null) {

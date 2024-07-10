@@ -36,6 +36,11 @@
             "foreground": "#cccccc" // light grey
         },
         {
+            "name": "textree provisional",
+            "scope": "provisional.txtree",
+            "foreground": "#cccccc" // light grey
+        },
+        {
             "name": "textree name",
             "scope": "name.txtree",
             "foreground": "#5ebbff" // light Blue

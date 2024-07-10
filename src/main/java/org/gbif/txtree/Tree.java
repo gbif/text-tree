@@ -29,6 +29,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   public static final String HOMOTYPIC_SYMBOL = "≡";
   public static final String BASIONYM_SYMBOL = "$";
   public static final String EXTINCT_SYMBOL = "†";
+  public static final String PROVISIONAL_SYMBOL = "?";
 
   private static final Logger LOG = LoggerFactory.getLogger(Tree.class);
   private static final String ANY_CHAR = "[^\t\n\r]";
@@ -37,10 +38,11 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "([*" + SYNONYM_SYMBOL + HOMOTYPIC_SYMBOL + "])?" +  // #2
       "(\\" + BASIONYM_SYMBOL + ")?" +  // #3
       "(" + EXTINCT_SYMBOL + ")?" +  // #4
-      "("+ANY_CHAR+"+?)" +   // name & author #5
-      "(?: \\[([a-z _-]+)])?" +  // rank #6
-      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #7
-      "(?:\\s+#\\s*(.*))?" +  // comments #8
+      "(\\" + PROVISIONAL_SYMBOL + ")?" +  // #5
+      "("+ANY_CHAR+"+?)" +   // name & author #6
+      "(?: \\[([a-z _-]+)])?" +  // rank #7
+      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #8
+      "(?:\\s+#\\s*(.*))?" +  // comments #9
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
   private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*,\\s*");
@@ -244,18 +246,20 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean homotypic = Objects.equals(m.group(2), HOMOTYPIC_SYMBOL);
     boolean basionym = m.group(3) != null;
     boolean extinct = m.group(4) != null;
-    String name = m.group(5).trim();
-    String rank = StringUtils.trimToNull(m.group(6));
-    return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, parseInfos(m), m.group(8));
+    boolean provisional = m.group(5) != null;
+    String name = m.group(6).trim();
+    String rank = StringUtils.trimToNull(m.group(7));
+    return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, provisional, parseInfos(m), m.group(9));
   }
 
   private static ParsedTreeNode parsedNode(long row, Matcher m) {
     boolean homotypic = Objects.equals(m.group(2), HOMOTYPIC_SYMBOL);
     boolean basionym = m.group(3) != null;
     boolean extinct = m.group(4) != null;
-    String name = m.group(5).trim();
+    boolean provisional = m.group(5) != null;
+    String name = m.group(6).trim();
     Rank rank = null;
-    String vrank = StringUtils.trimToNull(m.group(6));
+    String vrank = StringUtils.trimToNull(m.group(7));
     if (vrank != null) {
       rank = Rank.valueOf(vrank.toUpperCase().replace(' ', '_'));
     }
@@ -269,12 +273,12 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     } catch (InterruptedException e) {
       throw new RuntimeException(e); // not great, but dont want to expose the exception
     }
-    return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, parseInfos(m), m.group(8));
+    return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, provisional, parseInfos(m), m.group(9));
   }
 
   private static Map<String, String[]> parseInfos(Matcher m) throws IllegalArgumentException {
-    if (m.group(7) != null) {
-      Matcher im = INFO_PARSER.matcher(m.group(7));
+    if (m.group(8) != null) {
+      Matcher im = INFO_PARSER.matcher(m.group(8));
       Map<String, String[]> infos = new LinkedHashMap<>();
       while (im.find()) {
         infos.put(im.group(1), COMMA_SPLITTER.split(im.group(2).trim()));
@@ -337,11 +341,11 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       this.node = node;
     }
     
-    public boolean moreSynonyms() {
+    boolean moreSynonyms() {
       return node.synonyms.size() > synIdx;
     }
     
-    public NNIter nextSynonym() {
+    NNIter nextSynonym() {
       T n = node.synonyms.get(synIdx);
       synIdx++;
       return new NNIter(n);
@@ -380,8 +384,11 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     
     private void poll() {
       curr = stack.removeLast();
-      while (!curr.node.children.isEmpty()) {
-        stack.add(new NNIter(curr.node.children.removeLast()));
+      if (!curr.node.children.isEmpty()) {
+        var iter = curr.node.children.descendingIterator();
+        while (iter.hasNext()) {
+          stack.add(new NNIter(iter.next()));
+        }
       }
     }
     

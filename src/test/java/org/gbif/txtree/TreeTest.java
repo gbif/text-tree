@@ -63,7 +63,7 @@ public class TreeTest {
     for (var n : tree) {
       System.out.println(n.name);
       assertNotNull(n.name);
-      if (!n.name.startsWith("?")) {
+      if (!n.name.startsWith("californicum")) {
         assertNotNull(n.rank);
       }
     }
@@ -145,6 +145,45 @@ public class TreeTest {
   }
 
   @Test
+  public void provisional() throws Exception {
+    Tree<SimpleTreeNode> tree = Tree.simple(resource("prov.txtree"));
+
+    assertEquals(13, tree.size());
+    int counter = 0;
+    for (TreeNode<SimpleTreeNode> n : tree) {
+      counter++;
+      assertFalse(n.name.startsWith("?"));
+      if (n.name.startsWith("Troximon humilis") || n.name.startsWith("Macrorhynchus humilis") || n.name.startsWith("Cichorioideae")) {
+        assertTrue(n.provisional);
+      } else {
+        assertFalse(n.provisional);
+      }
+    }
+    assertEquals(tree.size(), counter);
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    assertEquals(IOUtils.toString(resource("prov.txtree"), "UTF8").trim(), buffer.toString().trim());
+
+  }
+
+  @Test
+  public void multiIteration() throws Exception {
+    Tree<SimpleTreeNode> tree = Tree.simple(resource("prov.txtree"));
+    assertEquals(13, tree.size());
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    String v1 = buffer.toString().trim();
+
+    buffer = new StringWriter();
+    tree.print(buffer);
+    String v2 = buffer.toString().trim();
+
+    assertEquals(v2, v1);
+  }
+
+  @Test
   public void parsed() throws Exception {
     Tree<ParsedTreeNode> tree = Tree.parsed(resource("test2.txt"));
 
@@ -158,7 +197,7 @@ public class TreeTest {
     for (ParsedTreeNode n : tree) {
       System.out.println(n.name);
       assertNotNull(n.name);
-      if (!n.name.startsWith("?")) {
+      if (!n.name.startsWith("californicum")) {
         assertNotNull(n.rank);
       }
       assertNotNull(n.parsedName);

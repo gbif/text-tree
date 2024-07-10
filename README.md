@@ -54,6 +54,14 @@ Agoseris apargioides (Less.) Greene [species]
   ≡Agoseris apargioides var. eastwoodiae (Fedde) Munz [variety]
 ```
 
+Provisional names, e.g. with uncertain placement or lacking scrutiny, 
+can be prefixed with a `?` to distinguish them from properly accepted names:
+```
+Agoseris Raf. [genus]
+  Agoseris apargioides (Less.) Greene [species]
+  ?Troximon humilis (Benth.) A.Gray [species]
+```
+
 The common convention to prefix extinct taxa with a dagger symbol is also supported:
 ```
 Reptilia [class]
