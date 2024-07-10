@@ -23,6 +23,10 @@
 					"match": "\\†"
 				},
 				{
+					"name": "provisional.txtree",
+					"match": "\\?"
+				},
+				{
 					"name": "name.txtree",
 					"match": "\\b[^*$\\[{]+"
 				},

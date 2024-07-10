@@ -54,6 +54,15 @@
 			}
 		},
 		{
+			"name": "Provisional",
+			"scope": [
+				"provisional.txtree"
+			],
+			"settings": {
+				"foreground": "#CCCCCC"
+			}
+		},
+		{
 			"name": "Name",
 			"scope": [
 				"name.txtree"
