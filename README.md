@@ -122,8 +122,8 @@ Please make sure to also switch your color theme in your settings to the bundled
 We also provide a [TextTree sublime package](https://github.com/gbif/text-tree-sublime) that defines the syntax highlighting for the [Sublime Text](https://www.sublimetext.com) editor.
 To use it simply install it via the default [Package Control](https://packagecontrol.io/docs/usage) repository.
 
-![](https://github.com/gbif/text-tree-sublime/Screenshot2.png)
+![](https://raw.githubusercontent.com/gbif/text-tree-sublime/refs/heads/master/Screenshot2.png)
 
-![](https://github.com/gbif/text-tree-sublime/Screenshot1.png)
+![](https://raw.githubusercontent.com/gbif/text-tree-sublime/refs/heads/master/Screenshot1.png)
 
 
