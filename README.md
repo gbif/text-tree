@@ -119,12 +119,11 @@ Please make sure to also switch your color theme in your settings to the bundled
 
 
 ## Sublime syntax highlighting
-We also provide a [TextTree sublime package](sublime/TextTree/TextTree.sublime-syntax) that defines the syntax highlighting for the [Sublime Text](https://www.sublimetext.com) editor.
-To use it simply copy the folder [TextTree](sublime/TextTree) into your sublime package folder, e.g. ```/Users/YOUR_NAME/Library/Application\ Support/Sublime\ Text\ 3/Packages``` on most Macs.
-Or chose `Settings -> Browse Packages...` to let Sublime take you to your package folder.
+We also provide a [TextTree sublime package](https://github.com/gbif/text-tree-sublime) that defines the syntax highlighting for the [Sublime Text](https://www.sublimetext.com) editor.
+To use it simply install it via the default [Package Control](https://packagecontrol.io/docs/usage) repository.
 
-![](sublime/Screenshot2.png)
+![](https://github.com/gbif/text-tree-sublime/Screenshot2.png)
 
-![](sublime/Screenshot1.png)
+![](https://github.com/gbif/text-tree-sublime/Screenshot1.png)
 
 
