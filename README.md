@@ -92,7 +92,7 @@ Pinales [order]
 ```
 
 ## ChecklistBank guide
-[ChecklistBank](httpps://www.checklistbank.org) provides a small [publishing guide]([url](https://github.com/CatalogueOfLife/coldp/blob/master/docs/publishing-guide-txtree.md)) for TextTree based datasets which defines a small set of info keys and a way to share structured references.
+[ChecklistBank](httpps://www.checklistbank.org) provides a small [publishing guide](https://github.com/CatalogueOfLife/coldp/blob/master/docs/publishing-guide-txtree.md) for TextTree based datasets which defines a small set of info keys and a way to share structured references.
 
 
 
