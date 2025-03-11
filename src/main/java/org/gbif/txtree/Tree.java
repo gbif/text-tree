@@ -183,13 +183,31 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     return tree;
   }
 
+  public static class VerificationResult {
+    public final boolean valid;
+    public final int lines;
+    public final String message;
+
+    public VerificationResult(boolean valid, int lines, String message) {
+        this.valid = valid;
+        this.lines = lines;
+        this.message = message;
+    }
+    private static VerificationResult failed(String message, int lines) {
+      return new VerificationResult(false, lines, message);
+    }
+    private static VerificationResult valid(int lines) {
+      return new VerificationResult(true, lines, "The tree is valid");
+    }
+  }
+
   /**
    * Verifies that the given input stream contains a valid text tree.
    * Especially useful for verifying that the tree is properly indented.
    * @param stream tree input
-   * @return true if the input stream contains a valid text tree
+   * @return error message or NULL if the input stream contains a valid text tree
    */
-  public static boolean verify(InputStream stream) throws IOException {
+  public static VerificationResult verify(InputStream stream) throws IOException {
     return verify(new InputStreamReader(stream, StandardCharsets.UTF_8));
   }
 
@@ -197,9 +215,9 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * Verifies that the given input stream contains a valid text tree.
    * Especially useful for verifying that the tree is properly indented.
    * @param reader tree input
-   * @return true if the input stream contains a valid text tree
+   * @return error message or NULL if the input stream contains a valid text tree
    */
-  public static boolean verify(Reader reader) throws IOException {
+  public static VerificationResult verify(Reader reader) throws IOException {
     var br = new BufferedReader(reader);
     String line = br.readLine();
     int counter = 0;
@@ -213,33 +231,28 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
             int level = m.group(1).length();
             max = Math.max(max, level);
             if (level % 2 != 0) {
-              LOG.error("Tree is not indented properly on line {}. Use 2 spaces only: {}", counter, line);
-              return false;
+              return VerificationResult.failed(String.format("Tree is not indented properly on line %s. Use 2 spaces only: %s", counter, line), counter);
             }
             if (level-last>2) {
-              LOG.error("Tree is indented too much on line {}. Use 2 spaces only: {}", counter, line);
-              return false;
+              return VerificationResult.failed(String.format("Tree is indented too much on line %s. Use 2 spaces only: %s", counter, line), counter);
             }
             last = level;
           } else {
-            LOG.error("Failed to parse Tree on line {}: {}", counter, line);
-            return false;
+            return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", counter, line), counter);
           }
         }
         line = br.readLine();
         counter++;
       }
       if (max==0 && counter > 8) {
-        LOG.error("Tree is not indented at all");
-        return false;
+        return VerificationResult.failed("Tree is not indented at all", counter);
       }
 
     } catch (IllegalArgumentException e) {
-      LOG.error("Failed to parse Tree on line {}: {}", counter, line, e);
-      return false;
+      return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", counter, line), counter);
     }
     // should we require some other level than just 0???
-    return true;
+    return VerificationResult.valid(counter);
   }
 
   private static SimpleTreeNode simpleNode(long row, Matcher m) {

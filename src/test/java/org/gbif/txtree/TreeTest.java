@@ -207,14 +207,14 @@ public class TreeTest {
 
   @Test
   public void testVerify() throws Exception {
-    assertTrue(Tree.verify(resource("test.txt")));
-    assertTrue(Tree.verify(resource("test2.txt")));
-    assertTrue(Tree.verify(resource("test-ranks.txt")));
+    assertTrue(Tree.verify(resource("test.txt")).valid);
+    assertTrue(Tree.verify(resource("test2.txt")).valid);
+    assertTrue(Tree.verify(resource("test-ranks.txt")).valid);
 
-    assertFalse(Tree.verify(resource("badtree.txt")));
-    assertFalse(Tree.verify(resource("notree.txt")));
-    assertFalse(Tree.verify(resource("notree2.txt")));
-    assertFalse(Tree.verify(resource("dwca.txt")));
+    assertFalse(Tree.verify(resource("badtree.txt")).valid);
+    assertFalse(Tree.verify(resource("notree.txt")).valid);
+    assertFalse(Tree.verify(resource("notree2.txt")).valid);
+    assertFalse(Tree.verify(resource("dwca.txt")).valid);
   }
 
   @Test
