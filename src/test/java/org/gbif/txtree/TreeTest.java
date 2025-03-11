@@ -211,6 +211,7 @@ public class TreeTest {
     assertTrue(Tree.verify(resource("test2.txt")).valid);
     assertTrue(Tree.verify(resource("test-ranks.txt")).valid);
 
+    assertFalse(Tree.verify(resource("badly-indented.txt")).valid);
     assertFalse(Tree.verify(resource("badtree.txt")).valid);
     assertFalse(Tree.verify(resource("notree.txt")).valid);
     assertFalse(Tree.verify(resource("notree2.txt")).valid);

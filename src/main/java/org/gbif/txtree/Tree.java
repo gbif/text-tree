@@ -39,7 +39,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "(\\" + BASIONYM_SYMBOL + ")?" +  // #3
       "(" + EXTINCT_SYMBOL + ")?" +  // #4
       "(\\" + PROVISIONAL_SYMBOL + ")?" +  // #5
-      "("+ANY_CHAR+"+?)" +   // name & author #6
+      "([^\t\n\r\\s]"+ANY_CHAR+"+?)" +   // name & author #6
       "(?: \\[([a-z _-]+)])?" +  // rank #7
       "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #8
       "(?:\\s+#\\s*(.*))?" +  // comments #9
