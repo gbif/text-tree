@@ -1,0 +1,7 @@
+Pinales [order]
+  Pinaceae Spreng. [family]
+    Abies [genus]
+      Abies alba Mill. [genus] {ID=1234 PUB=Miller2019 ENV=terrestrial,marine REF=Döring2021,Banki2022 VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik}
+        *Pinus picea L. [species]
+      Abies balsamea (L.) Mill. [species] {PUB=Miller2019}  # need to verify the reference
+        *$Pinus balsamea L. [species]   # this is the basionym of A. balsamea

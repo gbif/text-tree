@@ -207,6 +207,8 @@ public class TreeTest {
 
   @Test
   public void testVerify() throws Exception {
+    assertFalse(Tree.verify(resource("badly-indented.txt")).valid);
+
     assertTrue(Tree.verify(resource("test.txt")).valid);
     assertTrue(Tree.verify(resource("test2.txt")).valid);
     assertTrue(Tree.verify(resource("test-ranks.txt")).valid);
@@ -233,6 +235,43 @@ public class TreeTest {
       assertNotNull(n.name);
     }
   }
+
+  @Test
+  public void infos2() throws Exception {
+    assertTrue(Tree.verify(resource("infos.txt")).valid);
+    var tree = Tree.simple(resource("infos.txt"));
+
+    tree.print(System.out);
+
+    System.out.println("Tree traversal");
+    boolean abies_alba_found = false;
+    for (var n : tree) {
+      assertNotNull(n.name);
+      if (n.name.startsWith("Abies alba")) {
+        abies_alba_found = true;
+        // ID=1234
+        // PUB=Miller2019
+        // ENV=terrestrial,marine
+        // REF=Döring2021,Banki2022
+        // VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik
+        assertEquals(5, n.infos.size());
+        assertEquals(new String[]{"1234"}, n.infos.get("ID"));
+        assertEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
+        assertEquals(new String[]{"terrestrial","marine"}, n.infos.get("ENV"));
+        assertEquals(new String[]{"Döring2021","Banki2022"}, n.infos.get("REF"));
+        assertEquals(new String[]{"de:Traubeneiche","fr:Chêne rouvre","dk:Vintereg","nl:Wintereik"}, n.infos.get("VERN"));
+
+      } else if (n.name.startsWith("Abies balsamea")) {
+        assertEquals(1, n.infos.size());
+        assertEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
+
+      } else {
+        assertTrue(n.infos.isEmpty());
+      }
+    }
+    assertTrue(abies_alba_found);
+  }
+
   static InputStream resource(String resourceName) {
     return ClassLoader.getSystemResourceAsStream(resourceName);
   }

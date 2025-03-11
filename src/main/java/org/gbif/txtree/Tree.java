@@ -220,7 +220,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   public static VerificationResult verify(Reader reader) throws IOException {
     var br = new BufferedReader(reader);
     String line = br.readLine();
-    int counter = 0;
+    int lineNumber = 1;
     try {
       int max = 0;
       int last = 0;
@@ -231,28 +231,28 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
             int level = m.group(1).length();
             max = Math.max(max, level);
             if (level % 2 != 0) {
-              return VerificationResult.failed(String.format("Tree is not indented properly on line %s. Use 2 spaces only: %s", counter, line), counter);
+              return VerificationResult.failed(String.format("Tree is not indented properly on line %s. Use 2 spaces only: %s", lineNumber, line), lineNumber);
             }
             if (level-last>2) {
-              return VerificationResult.failed(String.format("Tree is indented too much on line %s. Use 2 spaces only: %s", counter, line), counter);
+              return VerificationResult.failed(String.format("Tree is indented too much on line %s. Use 2 spaces only: %s", lineNumber, line), lineNumber);
             }
             last = level;
           } else {
-            return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", counter, line), counter);
+            return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", lineNumber, line), lineNumber);
           }
         }
         line = br.readLine();
-        counter++;
+        lineNumber++;
       }
-      if (max==0 && counter > 8) {
-        return VerificationResult.failed("Tree is not indented at all", counter);
+      if (max==0 && lineNumber > 8) {
+        return VerificationResult.failed("Tree is not indented at all", lineNumber);
       }
 
     } catch (IllegalArgumentException e) {
-      return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", counter, line), counter);
+      return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", lineNumber, line), lineNumber);
     }
     // should we require some other level than just 0???
-    return VerificationResult.valid(counter);
+    return VerificationResult.valid(lineNumber);
   }
 
   private static SimpleTreeNode simpleNode(long row, Matcher m) {
