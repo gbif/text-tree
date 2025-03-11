@@ -5,7 +5,7 @@
 
   <groupId>org.gbif</groupId>
   <artifactId>text-tree</artifactId>
-  <version>1.6.3-SNAPSHOT</version>
+  <version>1.6.4-SNAPSHOT</version>
 
   <name>Text Tree</name>
   <description>A simple taxonomic tree format using indented plain text.</description>
