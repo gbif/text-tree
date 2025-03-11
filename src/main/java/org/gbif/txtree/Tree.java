@@ -252,7 +252,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", lineNumber, line), lineNumber);
     }
     // should we require some other level than just 0???
-    return VerificationResult.valid(lineNumber);
+    return VerificationResult.valid(lineNumber-1);
   }
 
   private static SimpleTreeNode simpleNode(long row, Matcher m) {
