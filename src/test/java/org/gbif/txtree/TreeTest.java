@@ -122,7 +122,7 @@ public class TreeTest {
     tree.print(buffer);
     // * replaced with =
     assertEquals(IOUtils.toString(resource("oldstyle.txtree"), "UTF8").trim()
-            .replaceAll("\\*", "="), buffer.toString().trim());
+            .replaceAll("\\* *", "="), buffer.toString().trim());
   }
 
   @Test

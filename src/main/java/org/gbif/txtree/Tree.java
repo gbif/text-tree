@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
  * Iterating over the tree goes in
  */
 public class Tree<T extends TreeNode<T>> implements Iterable<T> {
+  public static final String SYNONYM_OLD_SYMBOL = "*";
   public static final String SYNONYM_SYMBOL = "=";
   public static final String HOMOTYPIC_SYMBOL = "≡";
   public static final String BASIONYM_SYMBOL = "$";
@@ -34,15 +35,12 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   private static final Logger LOG = LoggerFactory.getLogger(Tree.class);
   private static final String ANY_CHAR = "[^\t\n\r]";
   private static final Pattern LINE_PARSER = Pattern.compile("^" +
-      "((?:  )*)" +  // indent #1
-      "([*" + SYNONYM_SYMBOL + HOMOTYPIC_SYMBOL + "])?" +  // #2
-      "(\\" + BASIONYM_SYMBOL + ")?" +  // #3
-      "(" + EXTINCT_SYMBOL + ")?" +  // #4
-      "(\\" + PROVISIONAL_SYMBOL + ")?" +  // #5
-      "([^\t\n\r\\s]"+ANY_CHAR+"+?)" +   // name & author #6
-      "(?: \\[([a-z _-]+)])?" +  // rank #7
-      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #8
-      "(?:\\s+#\\s*(.*))?" +  // comments #9
+      "((?:  )*)" + // indent #1
+      "([=≡$†?*]+ *)?" + // name prefix symbols #2
+      "([^\t\n\r\\s]"+ANY_CHAR+"+?)" +   // name & author #3
+      "(?: \\[([a-z _-]+)])?" +  // rank #4
+      "(?: +\\{("+ANY_CHAR+"*)})?" +  // infos #5
+      "(?:\\s+#\\s*(.*))?" +  // comments #6
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
   private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*,\\s*");
@@ -161,7 +159,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
               throw new IllegalArgumentException("Tree is not properly indented on line " + row + ". Use 2 spaces for children: " + line);
             }
             T p = parents.peekLast();
-            if (m.group(2) != null) {
+            if (isSynonym(m.group(2))) {
               p.synonyms.add(n);
             } else {
               p.children.add(n);
@@ -181,6 +179,14 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       row++;
     }
     return tree;
+  }
+
+  private static boolean isSynonym(String flags) {
+    return flags != null && (
+           flags.contains(SYNONYM_SYMBOL) ||
+           flags.contains(SYNONYM_OLD_SYMBOL) ||
+           flags.contains(HOMOTYPIC_SYMBOL)
+    );
   }
 
   public static class VerificationResult {
@@ -256,23 +262,25 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   }
 
   private static SimpleTreeNode simpleNode(long row, Matcher m) {
-    boolean homotypic = Objects.equals(m.group(2), HOMOTYPIC_SYMBOL);
-    boolean basionym = m.group(3) != null;
-    boolean extinct = m.group(4) != null;
-    boolean provisional = m.group(5) != null;
-    String name = m.group(6).trim();
-    String rank = StringUtils.trimToNull(m.group(7));
-    return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, provisional, parseInfos(m), m.group(9));
+    String flags = m.group(2) == null ? "" : m.group(2);
+    boolean homotypic = flags.contains(HOMOTYPIC_SYMBOL);
+    boolean basionym = flags.contains(BASIONYM_SYMBOL);
+    boolean extinct = flags.contains(EXTINCT_SYMBOL);
+    boolean provisional = flags.contains(PROVISIONAL_SYMBOL);
+    String name = m.group(3).trim();
+    String rank = StringUtils.trimToNull(m.group(4));
+    return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, provisional, parseInfos(m.group(5)), m.group(6));
   }
 
   private static ParsedTreeNode parsedNode(long row, Matcher m) {
-    boolean homotypic = Objects.equals(m.group(2), HOMOTYPIC_SYMBOL);
-    boolean basionym = m.group(3) != null;
-    boolean extinct = m.group(4) != null;
-    boolean provisional = m.group(5) != null;
-    String name = m.group(6).trim();
+    String flags = m.group(2) == null ? "" : m.group(2);
+    boolean homotypic = flags.contains(HOMOTYPIC_SYMBOL);
+    boolean basionym = flags.contains(BASIONYM_SYMBOL);
+    boolean extinct = flags.contains(EXTINCT_SYMBOL);
+    boolean provisional = flags.contains(PROVISIONAL_SYMBOL);
+    String name = m.group(3).trim();
     Rank rank = null;
-    String vrank = StringUtils.trimToNull(m.group(7));
+    String vrank = StringUtils.trimToNull(m.group(4));
     if (vrank != null) {
       rank = Rank.valueOf(vrank.toUpperCase().replace(' ', '_'));
     }
@@ -286,12 +294,12 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     } catch (InterruptedException e) {
       throw new RuntimeException(e); // not great, but dont want to expose the exception
     }
-    return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, provisional, parseInfos(m), m.group(9));
+    return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, provisional, parseInfos(m.group(5)), m.group(6));
   }
 
-  private static Map<String, String[]> parseInfos(Matcher m) throws IllegalArgumentException {
-    if (m.group(8) != null) {
-      Matcher im = INFO_PARSER.matcher(m.group(8));
+  private static Map<String, String[]> parseInfos(String infoString) throws IllegalArgumentException {
+    if (infoString != null) {
+      Matcher im = INFO_PARSER.matcher(infoString);
       Map<String, String[]> infos = new LinkedHashMap<>();
       while (im.find()) {
         infos.put(im.group(1), COMMA_SPLITTER.split(im.group(2).trim()));
