@@ -86,9 +86,9 @@ Pinales [order]
   Pinaceae Spreng. [family]
     Abies [genus]
       Abies alba Mill. [species]
-        *Pinus picea L. [species]
+        =Pinus picea L. [species]
       Abies balsamea (L.) Mill. [species] {PUB=Miller2019}  # need to verify the reference
-        *$Pinus balsamea L. [species]   # this is the basionym of A. balsamea 
+        =$Pinus balsamea L. [species]   # this is the basionym of A. balsamea 
 ```
 
 ## ChecklistBank guide
