@@ -92,7 +92,7 @@ Pinales [order]
 ```
 
 ## ChecklistBank guide
-[ChecklistBank](httpps://www.checklistbank.org) provides a small [publishing guide](https://github.com/CatalogueOfLife/coldp/blob/master/docs/publishing-guide-txtree.md) for TextTree based datasets which defines a small set of info keys and a way to share structured references.
+[ChecklistBank](https://www.checklistbank.org) provides a small [publishing guide](https://catalogueoflife.github.io/coldp/docs/publishing-guide-txtree) for TextTree based datasets which defines a small set of info keys and a way to share structured references.
 
 
 
@@ -122,8 +122,8 @@ Please make sure to also switch your color theme in your settings to the bundled
 We also provide a [TextTree sublime package](https://github.com/gbif/text-tree-sublime) that defines the syntax highlighting for the [Sublime Text](https://www.sublimetext.com) editor.
 To use it simply install it via the default [Package Control](https://packagecontrol.io/docs/usage) repository.
 
-![](https://raw.githubusercontent.com/gbif/text-tree-sublime/refs/heads/master/Screenshot2.png)
+![](https://gbif.github.io/text-tree-sublime/Screenshot2.png)
 
-![](https://raw.githubusercontent.com/gbif/text-tree-sublime/refs/heads/master/Screenshot1.png)
+![](https://gbif.github.io/text-tree-sublime/Screenshot1.png)
 
 
