@@ -43,7 +43,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "(?:\\s+#\\s*(.*))?" +  // comments #6
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
-  private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*,\\s*");
+  private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*(?<!,),(?!,)\\s*");
   private static final NameParserGBIF NAME_PARSER = new NameParserGBIF();
   private long count;
   private final List<T> root = new ArrayList<>();
@@ -302,7 +302,11 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       Matcher im = INFO_PARSER.matcher(infoString);
       Map<String, String[]> infos = new LinkedHashMap<>();
       while (im.find()) {
-        infos.put(im.group(1), COMMA_SPLITTER.split(im.group(2).trim()));
+        var vals = COMMA_SPLITTER.split(im.group(2).trim());
+        infos.put(im.group(1), Arrays.stream(vals)
+                .map(x->x.replaceAll(",,", ","))
+                .toArray(String[]::new)
+        );
       }
       return infos;
     }

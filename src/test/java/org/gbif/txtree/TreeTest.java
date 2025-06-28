@@ -265,6 +265,15 @@ public class TreeTest {
         assertEquals(1, n.infos.size());
         assertEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
 
+      } else if (n.name.startsWith("Abies alpina")) {
+        assertEquals(3, n.infos.size());
+        assertEquals(new String[]{"botany"}, n.infos.get("CODE"));
+        assertEquals(new String[]{"holotype:Berlin,B45641","paratype:Berlin,B8932"}, n.infos.get("TM"));
+
+      } else if (n.name.equals("Abies")) {
+        assertEquals(2, n.infos.size());
+        assertEquals(new String[]{"Abies_alba_Mill."}, n.infos.get("TYPE"));
+
       } else {
         assertTrue(n.infos.isEmpty());
       }
