@@ -1,11 +1,7 @@
 package org.gbif.txtree;
 
-import org.gbif.nameparser.api.Rank;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**

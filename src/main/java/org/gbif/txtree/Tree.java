@@ -1,7 +1,8 @@
 package org.gbif.txtree;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gbif.nameparser.NameParserGBIF;
+import org.gbif.nameparser.NameParserImpl;
+import org.gbif.nameparser.api.NameParser;
 import org.gbif.nameparser.api.ParsedName;
 import org.gbif.nameparser.api.Rank;
 import org.gbif.nameparser.api.UnparsableNameException;
@@ -44,7 +45,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
   private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*(?<!,),(?!,)\\s*");
-  private static final NameParserGBIF NAME_PARSER = new NameParserGBIF();
+  private static final NameParser NAME_PARSER = new NameParserImpl();
   private long count;
   private final List<T> root = new ArrayList<>();
 
@@ -287,12 +288,10 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
     ParsedName pn = null;
     try {
-      pn = NAME_PARSER.parse(name, rank, null);
+      pn = NAME_PARSER.parse(name, null, rank, null);
       pn.setRank(rank); // make sure to keep the original rank
     } catch (UnparsableNameException e) {
       LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e); // not great, but dont want to expose the exception
     }
     return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, provisional, parseInfos(m.group(5)), m.group(6));
   }
