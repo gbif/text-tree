@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,6 +103,10 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     return parse(reader, null, Tree::simpleNode);
   }
 
+  public static Tree<SimpleTreeNode> simple(Reader reader, Consumer<TreeLine> listener) throws IOException {
+    return parse(reader, listener, Tree::simpleNode);
+  }
+
   /**
    * Builds a new parsed tree instance by parsing the given UTF8 input stream
    * and using the GBIF name parser to create parsed names.
@@ -132,10 +135,18 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     return parse(new InputStreamReader(stream, StandardCharsets.UTF_8), listener, Tree::parsedNode);
   }
 
-  private static <T extends TreeNode<T>> Tree<T> parse(Reader reader,
-                                                       Consumer<TreeLine> listener,
-                                                       BiFunction<Long, Matcher, T> builder
-                                                       ) throws IOException {
+  /**
+   * Builds a tree of any node type by parsing the given reader, delegating node construction to the
+   * given factory. This is the extension point {@code text-tree-parsed} builds on.
+   *
+   * @param reader   the tree input
+   * @param listener optional listener passed the verbatim line for each processed row, may be null
+   * @param factory  builds a node from the components of each line and its parent
+   */
+  public static <T extends TreeNode<T>> Tree<T> parse(Reader reader,
+                                                      Consumer<TreeLine> listener,
+                                                      TreeNodeFactory<T> factory
+                                                      ) throws IOException {
     Tree<T> tree = new Tree<>();
     LinkedList<T> parents = new LinkedList<>();
 
@@ -154,12 +165,10 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
           }
           level = level / 2;
 
-          T n = builder.apply(row, m);
+          // resolve the parent before building the node, so the factory can see it
+          T parent = null;
           if (level == 0) {
-            tree.getRoot().add(n);
             parents.clear();
-            parents.add(n);
-
           } else {
             while (parents.size() > level) {
               // remove latest parents until we are at the right level
@@ -168,14 +177,18 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
             if (parents.size() < level) {
               throw new IllegalArgumentException("Tree is not properly indented on line " + row + ". Use 2 spaces for children: " + line);
             }
-            T p = parents.peekLast();
-            if (isSynonym(m.group(2))) {
-              p.synonyms.add(n);
-            } else {
-              p.children.add(n);
-            }
-            parents.add(n);
+            parent = parents.peekLast();
           }
+
+          T n = factory.create(data(row, m), parent);
+          if (parent == null) {
+            tree.getRoot().add(n);
+          } else if (isSynonym(m.group(2))) {
+            parent.synonyms.add(n);
+          } else {
+            parent.children.add(n);
+          }
+          parents.add(n);
 
           if (listener != null) {
             TreeLine tl = new TreeLine(row, level, line.trim(), n.infos);
@@ -271,38 +284,41 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     return VerificationResult.valid(lineNumber-1);
   }
 
-  private static SimpleTreeNode simpleNode(long row, Matcher m) {
+  private static TreeNodeData data(long row, Matcher m) {
     String flags = m.group(2) == null ? "" : m.group(2);
-    boolean homotypic = flags.contains(HOMOTYPIC_SYMBOL);
-    boolean basionym = flags.contains(BASIONYM_SYMBOL);
-    boolean extinct = flags.contains(EXTINCT_SYMBOL);
-    boolean provisional = flags.contains(PROVISIONAL_SYMBOL);
-    String name = m.group(3).trim();
-    String rank = trimToNull(m.group(4));
-    return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, provisional, parseInfos(m.group(5)), m.group(6));
+    return new TreeNodeData(
+        row,
+        m.group(3).trim(),
+        trimToNull(m.group(4)),
+        flags.contains(EXTINCT_SYMBOL),
+        flags.contains(BASIONYM_SYMBOL),
+        flags.contains(HOMOTYPIC_SYMBOL),
+        flags.contains(PROVISIONAL_SYMBOL),
+        parseInfos(m.group(5)),
+        m.group(6)
+    );
   }
 
-  private static ParsedTreeNode parsedNode(long row, Matcher m) {
-    String flags = m.group(2) == null ? "" : m.group(2);
-    boolean homotypic = flags.contains(HOMOTYPIC_SYMBOL);
-    boolean basionym = flags.contains(BASIONYM_SYMBOL);
-    boolean extinct = flags.contains(EXTINCT_SYMBOL);
-    boolean provisional = flags.contains(PROVISIONAL_SYMBOL);
-    String name = m.group(3).trim();
+  private static SimpleTreeNode simpleNode(TreeNodeData d, SimpleTreeNode parent) {
+    return new SimpleTreeNode(d.id(), d.name(), d.rank(), d.extinct(), d.basionym(),
+        d.homotypic(), d.provisional(), d.infos(), d.comment());
+  }
+
+  private static ParsedTreeNode parsedNode(TreeNodeData d, ParsedTreeNode parent) {
     Rank rank = null;
-    String vrank = trimToNull(m.group(4));
-    if (vrank != null) {
-      rank = Rank.valueOf(vrank.toUpperCase().replace(' ', '_'));
+    if (d.rank() != null) {
+      rank = Rank.valueOf(d.rank().toUpperCase().replace(' ', '_'));
     }
 
     ParsedName pn = null;
     try {
-      pn = NAME_PARSER.parse(name, null, rank, null);
+      pn = NAME_PARSER.parse(d.name(), null, rank, null);
       pn.setRank(rank); // make sure to keep the original rank
     } catch (UnparsableNameException e) {
       LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
     }
-    return new ParsedTreeNode(row, name, pn, extinct, basionym, homotypic, provisional, parseInfos(m.group(5)), m.group(6));
+    return new ParsedTreeNode(d.id(), d.name(), pn, d.extinct(), d.basionym(),
+        d.homotypic(), d.provisional(), d.infos(), d.comment());
   }
 
   private static Map<String, String[]> parseInfos(String infoString) throws IllegalArgumentException {
@@ -318,7 +334,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       }
       return infos;
     }
-    return Collections.EMPTY_MAP;
+    return Collections.emptyMap();
   }
 
   public List<T> getRoot() {

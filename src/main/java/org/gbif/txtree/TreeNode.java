@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Simple bean for representing a node in a taxonomic tree.
  */
-abstract class TreeNode<T extends TreeNode<T>> {
+public abstract class TreeNode<T extends TreeNode<T>> {
   public final long id;
   public final String name;
   public final String rank;

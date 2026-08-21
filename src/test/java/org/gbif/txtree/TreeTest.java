@@ -299,6 +299,34 @@ public class TreeTest {
           Aves [class]""", buffer.toString().trim());
   }
 
+  @Test
+  public void customNodeFactory() throws Exception {
+    // the SPI text-tree-parsed builds on: a factory sees every component of a line, plus its parent
+    var seen = new java.util.ArrayList<TreeNodeData>();
+    var parents = new java.util.ArrayList<String>();
+    TreeNodeFactory<SimpleTreeNode> factory = (d, parent) -> {
+      seen.add(d);
+      parents.add(parent == null ? null : parent.name);
+      return new SimpleTreeNode(d.id(), d.name(), d.rank(), d.extinct(), d.basionym(),
+          d.homotypic(), d.provisional(), d.infos(), d.comment());
+    };
+
+    var tree = Tree.parse(new java.io.InputStreamReader(resource("extinct.txtree"),
+        StandardCharsets.UTF_8), null, factory);
+
+    assertEquals(tree.size(), seen.size());
+    assertEquals("Animalia", seen.get(0).name());
+    assertEquals("kingdom", seen.get(0).rank());
+    assertEquals(1, seen.get(0).id());
+    assertFalse(seen.get(0).extinct());
+    assertTrue(seen.stream().anyMatch(TreeNodeData::extinct));
+
+    // the root has no parent, everything below it does
+    assertNull(parents.get(0));
+    assertEquals("Animalia", parents.get(1));
+    assertTrue(parents.stream().skip(1).allMatch(java.util.Objects::nonNull));
+  }
+
   static InputStream resource(String resourceName) {
     return ClassLoader.getSystemResourceAsStream(resourceName);
   }
