@@ -19,30 +19,29 @@
   </scm>
 
   <properties>
-    <minimumMavenVersion>3.3</minimumMavenVersion>
+    <minimumMavenVersion>3.6.3</minimumMavenVersion>
     <jdkLevel>17</jdkLevel>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- dependency versions -->
-    <commons-io.version>2.15.0</commons-io.version>
-    <junit.version>4.13.2</junit.version>
-    <logback.version>1.2.3</logback.version>
+    <junit.version>6.1.3</junit.version>
+    <logback.version>1.6.3</logback.version>
     <name-parser.version>4.0.0</name-parser.version>
-    <slf4j.version>1.7.30</slf4j.version>
+    <slf4j.version>2.0.18</slf4j.version>
 
     <!-- Maven plugin versions. Check for available updates: mvn versions:display-plugin-updates -->
-    <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-    <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
-    <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
-    <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
-    <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-    <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-    <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
-    <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-    <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+    <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+    <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+    <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+    <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+    <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+    <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
   </properties>
 
   <licenses>
@@ -103,15 +102,9 @@
 
     <!-- test deps -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons-io.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -123,16 +116,9 @@
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
-        <filtering>true</filtering>
       </testResource>
     </testResources>
 
@@ -157,14 +143,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>${maven-dependency-plugin.version}</version>
-          <!-- following is needed until 3.1.2 is released -->
-          <dependencies>
-            <dependency>
-              <groupId>org.apache.maven.shared</groupId>
-              <artifactId>maven-dependency-analyzer</artifactId>
-              <version>1.11.1</version>
-            </dependency>
-          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -217,7 +195,6 @@
             <!-- And here: https://talk.openmrs.org/t/error-could-not-find-or-load-main-class-org-apache-maven-surefire-booter-forkedbooter/20509 -->
             <argLine>
               -Djdk.net.URLClassPath.disableClassPathURLCheck=true
-              --illegal-access=permit
             </argLine>
             <runOrder>random</runOrder>
           </configuration>
@@ -259,9 +236,6 @@
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <!-- use default JVM settings <argLine>-Xmx256m</argLine> -->
             <runOrder>random</runOrder>
-            <argLine>
-              --illegal-access=permit
-            </argLine>
 
             <includes>
               <!-- include regular unit tests -->

@@ -1,13 +1,13 @@
 package org.gbif.txtree;
 
-import org.apache.commons.io.IOUtils;
-import org.gbif.nameparser.api.Rank;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TreeTest {
@@ -20,7 +20,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(buffer.toString().trim(), IOUtils.toString(resource("badranks.txtree"), "UTF8").trim());
+    assertEquals(buffer.toString().trim(), read("badranks.txtree").trim());
 
 
     System.out.println("Tree traversal");
@@ -38,7 +38,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(buffer.toString().trim(), IOUtils.toString(resource("test.txt"), "UTF8").trim());
+    assertEquals(buffer.toString().trim(), read("test.txt").trim());
 
 
     System.out.println("Tree traversal");
@@ -56,7 +56,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(IOUtils.toString(resource("test2-no-comments.txt"), "UTF8").trim(), buffer.toString().trim());
+    assertEquals(read("test2-no-comments.txt").trim(), buffer.toString().trim());
 
 
     System.out.println("Tree traversal");
@@ -77,7 +77,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(IOUtils.toString(resource("homotypic.txtree"), "UTF8").trim(), buffer.toString().trim());
+    assertEquals(read("homotypic.txtree").trim(), buffer.toString().trim());
 
 
     int homotpics = 0;
@@ -99,7 +99,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(IOUtils.toString(resource("extinct.txtree"), "UTF8").trim(), buffer.toString().trim());
+    assertEquals(read("extinct.txtree").trim(), buffer.toString().trim());
 
     int extinct = 0;
     System.out.println("Tree traversal");
@@ -121,7 +121,7 @@ public class TreeTest {
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
     // * replaced with =
-    assertEquals(IOUtils.toString(resource("oldstyle.txtree"), "UTF8").trim()
+    assertEquals(read("oldstyle.txtree").trim()
             .replaceAll("\\* *", "="), buffer.toString().trim());
   }
 
@@ -163,7 +163,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(IOUtils.toString(resource("prov.txtree"), "UTF8").trim(), buffer.toString().trim());
+    assertEquals(read("prov.txtree").trim(), buffer.toString().trim());
 
   }
 
@@ -191,7 +191,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(IOUtils.toString(resource("test2-no-comments.txt"), "UTF8").trim(), buffer.toString().trim());
+    assertEquals(read("test2-no-comments.txt").trim(), buffer.toString().trim());
 
     System.out.println("Tree traversal");
     for (ParsedTreeNode n : tree) {
@@ -228,7 +228,7 @@ public class TreeTest {
 
     StringWriter buffer = new StringWriter();
     tree.print(buffer);
-    assertEquals(IOUtils.toString(resource("test3clean.txt"), "UTF8").trim(), buffer.toString().trim());
+    assertEquals(read("test3clean.txt").trim(), buffer.toString().trim());
 
     System.out.println("Tree traversal");
     for (var n : tree) {
@@ -255,24 +255,24 @@ public class TreeTest {
         // REF=Döring2021,Banki2022
         // VERN=de:Traubeneiche,fr:Chêne rouvre,dk:Vintereg,nl:Wintereik
         assertEquals(5, n.infos.size());
-        assertEquals(new String[]{"1234"}, n.infos.get("ID"));
-        assertEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
-        assertEquals(new String[]{"terrestrial","marine"}, n.infos.get("ENV"));
-        assertEquals(new String[]{"Döring2021","Banki2022"}, n.infos.get("REF"));
-        assertEquals(new String[]{"de:Traubeneiche","fr:Chêne rouvre","dk:Vintereg","nl:Wintereik"}, n.infos.get("VERN"));
+        assertArrayEquals(new String[]{"1234"}, n.infos.get("ID"));
+        assertArrayEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
+        assertArrayEquals(new String[]{"terrestrial","marine"}, n.infos.get("ENV"));
+        assertArrayEquals(new String[]{"Döring2021","Banki2022"}, n.infos.get("REF"));
+        assertArrayEquals(new String[]{"de:Traubeneiche","fr:Chêne rouvre","dk:Vintereg","nl:Wintereik"}, n.infos.get("VERN"));
 
       } else if (n.name.startsWith("Abies balsamea")) {
         assertEquals(1, n.infos.size());
-        assertEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
+        assertArrayEquals(new String[]{"Miller2019"}, n.infos.get("PUB"));
 
       } else if (n.name.startsWith("Abies alpina")) {
         assertEquals(3, n.infos.size());
-        assertEquals(new String[]{"botany"}, n.infos.get("CODE"));
-        assertEquals(new String[]{"holotype:Berlin,B45641","paratype:Berlin,B8932"}, n.infos.get("TM"));
+        assertArrayEquals(new String[]{"botany"}, n.infos.get("CODE"));
+        assertArrayEquals(new String[]{"holotype:Berlin,B45641","paratype:Berlin,B8932"}, n.infos.get("TM"));
 
       } else if (n.name.equals("Abies")) {
         assertEquals(2, n.infos.size());
-        assertEquals(new String[]{"Abies_alba_Mill."}, n.infos.get("TYPE"));
+        assertArrayEquals(new String[]{"Abies_alba_Mill."}, n.infos.get("TYPE"));
 
       } else {
         assertTrue(n.infos.isEmpty());
@@ -283,6 +283,12 @@ public class TreeTest {
 
   static InputStream resource(String resourceName) {
     return ClassLoader.getSystemResourceAsStream(resourceName);
+  }
+
+  static String read(String resourceName) throws IOException {
+    try (InputStream in = resource(resourceName)) {
+      return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+    }
   }
 
 }
