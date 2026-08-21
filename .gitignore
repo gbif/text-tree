@@ -16,3 +16,8 @@ hs_err_pid*
 *.vsix
 # Superpowers SDD scratch
 .superpowers/
+
+# Eclipse / JDT language server
+.classpath
+.project
+.settings/
