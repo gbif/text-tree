@@ -96,14 +96,120 @@ Pinales [order]
 
 
 
-## Java package
-The Java code provided allows to parse and print text trees. The [Tree class](src/main/java/org/gbif/txtree/Tree.java) offers 2 kind of parsed trees:
+## Java packages
 
- 1) A simple tree which keeps the parsed rank and the name incl authorship as it was given in a single string.
- 2) A parsed tree which uses the [GBIF Name Parser](https://github.com/gbif/name-parser) to parse each name and provide in addition to the rank and name string
-    also a ParsedName instance.
-    
-When parsing badly formatted trees the parser on purpose fails and does not try to read the remaining bits.
+Two artifacts are published.
+
+### `org.gbif:text-tree`
+
+Reads and writes the format. **No runtime dependencies**, Java 17 or newer.
+
+```xml
+<dependency>
+  <groupId>org.gbif</groupId>
+  <artifactId>text-tree</artifactId>
+  <version>2.0.0</version>
+</dependency>
+```
+
+```java
+Tree<SimpleTreeNode> tree = Tree.simple(in);   // rank and name kept as given, as strings
+Tree.VerificationResult result = Tree.verify(in);
+```
+
+`Tree.parse(reader, listener, factory)` builds a tree of any node type you like — supply a
+`TreeNodeFactory` and it is handed a `TreeNodeData` for each line.
+
+### `org.gbif:text-tree-parsed`
+
+Adds `ParsedTree`, which runs every name through the
+[GBIF Name Parser](https://github.com/gbif/name-parser) and gives each node a `ParsedName`
+alongside the verbatim string.
+
+```xml
+<dependency>
+  <groupId>org.gbif</groupId>
+  <artifactId>text-tree-parsed</artifactId>
+  <version>2.0.0</version>
+</dependency>
+```
+
+You supply the parser. text-tree depends on `name-parser-api` only, never on an implementation —
+the current one, [`name-parser-rust`](https://github.com/gbif/name-parser-rust), needs JDK 22+ and
+a per-platform native jar, which text-tree does not force on anyone who is only reading trees:
+
+```java
+Tree<ParsedTreeNode> tree = ParsedTree.parse(in, new NameParserRust());
+
+for (ParsedTreeNode n : tree) {
+  n.result;      // ParseResult: Parsed | Informal | Unparsable, never null
+  n.parsedName;  // ParsedName, null only for Unparsable results
+  n.code;        // NomCode in scope, or null if the tree declares none
+}
+```
+
+The `CODE` info key sets the nomenclatural code for a name and is **inherited by its descendants**,
+as ChecklistBank does it. Declare it once near the root:
+
+```
+Plantae [kingdom] {CODE=botany}
+  Bryophyta [division]        # resolves to division_botany
+```
+
+It does two things: it disambiguates the ranks that exist once per code — `division`, plus
+`section` and `series` with their sub/super forms — and it is passed to the name parser, which uses
+it. (`subdivision` and `superdivision` are single ranks and need no code.) Values may
+be a `NomCode` name (`botanical`), its acronym (`ICN`, `ICZN`) or a common word (`botany`, `plants`,
+`zoology`). `ICPN` is not accepted: `PHYTO` and `PHYLO` both claim it. An unrecognised value is
+ignored and the inherited code stands.
+
+To wire the Rust binding, add the `os-maven-plugin` build extension so the native classifier jar
+resolves for your platform:
+
+```xml
+<build>
+  <extensions>
+    <extension>
+      <groupId>kr.motd.maven</groupId>
+      <artifactId>os-maven-plugin</artifactId>
+      <version>1.7.1</version>
+    </extension>
+  </extensions>
+</build>
+
+<dependency>
+  <groupId>org.gbif.nameparser</groupId>
+  <artifactId>name-parser-rust</artifactId>
+  <version>0.1.0</version>
+</dependency>
+<dependency>
+  <groupId>org.gbif.nameparser</groupId>
+  <artifactId>name-parser-rust</artifactId>
+  <version>0.1.0</version>
+  <classifier>${os.detected.classifier}</classifier>
+</dependency>
+```
+
+Run with `--enable-native-access=ALL-UNNAMED` to silence the JDK's restricted-method warning.
+
+When parsing badly formatted trees the parser on purpose fails and does not try to read the
+remaining bits.
+
+## Upgrading from 1.x
+
+- `Tree.simple(..)`, `Tree.verify(..)` and printing are unchanged. If that is all you use, bump the
+  version and delete any `org.gbif:name-parser` exclusion you had on text-tree.
+- `Tree.parsed(in)` becomes `ParsedTree.parse(in, parser)` in the new `text-tree-parsed` artifact,
+  and `org.gbif.txtree.ParsedTreeNode` moves to `org.gbif.txtree.parsed.ParsedTreeNode`.
+- A bare `[division]` now needs a nomenclatural code in scope, because `name-parser-api` 5.0.0
+  split `Rank.DIVISION` into `DIVISION_BOTANY` and `DIVISION_ZOOLOGY`. Either declare a
+  `{CODE=botany}` on the name or an ancestor, or write the rank out as `[division botany]` /
+  `[division zoology]`. `[section]`, `[series]` and their sub/super forms already behaved this way,
+  and now resolve from `CODE` too.
+- A rank resolved from a code re-prints in its resolved form: `[division]` under `{CODE=botany}`
+  comes back out as `[division_botany]`. The disambiguation is information the tree did not carry
+  before.
+- A line containing only whitespace is now skipped rather than failing the parse.
 
 
 ## Visual Studio Code Extension
