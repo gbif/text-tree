@@ -4,12 +4,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.gbif</groupId>
-  <artifactId>text-tree</artifactId>
-  <version>1.7.1-SNAPSHOT</version>
+  <artifactId>text-tree-parent</artifactId>
+  <version>2.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>Text Tree</name>
+  <name>Text Tree Parent</name>
   <description>A simple taxonomic tree format using indented plain text.</description>
-  <url>https://github.org/gbif/text-tree</url>
+  <url>https://github.com/gbif/text-tree</url>
+
+  <modules>
+    <module>text-tree</module>
+    <module>text-tree-parsed</module>
+  </modules>
 
   <scm>
     <connection>scm:git:git@github.com:gbif/text-tree.git</connection>
@@ -83,45 +89,39 @@
     </snapshotRepository>
   </distributionManagement>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gbif</groupId>
-      <artifactId>name-parser-api</artifactId>
-      <version>${name-parser.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gbif</groupId>
-      <artifactId>name-parser</artifactId>
-      <version>${name-parser.version}</version>
-    </dependency>
-
-    <!-- test deps -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.gbif</groupId>
+        <artifactId>text-tree</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.gbif</groupId>
+        <artifactId>name-parser-api</artifactId>
+        <version>${name-parser.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-      </testResource>
-    </testResources>
-
     <pluginManagement>
       <plugins>
         <plugin>
@@ -186,16 +186,10 @@
             </execution>
           </executions>
           <configuration>
-            <!-- Use a single forked process to execute all tests See https://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html -->
             <forkCount>1</forkCount>
             <reuseForks>false</reuseForks>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <!-- mem settings may not be necessary but the 3rd arg is. See here: -->
-            <!-- https://issues.apache.org/jira/browse/SUREFIRE-1588 -->
-            <!-- And here: https://talk.openmrs.org/t/error-could-not-find-or-load-main-class-org-apache-maven-surefire-booter-forkedbooter/20509 -->
-            <argLine>
-              -Djdk.net.URLClassPath.disableClassPathURLCheck=true
-            </argLine>
+            <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
             <runOrder>random</runOrder>
           </configuration>
         </plugin>
@@ -210,7 +204,6 @@
           <version>${maven-resources-plugin.version}</version>
         </plugin>
         <plugin>
-          <!-- Note: http://jira.codehaus.org/browse/MSOURCES-45, http://jira.codehaus.org/browse/MSOURCES-50 -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${maven-source-plugin.version}</version>
@@ -230,13 +223,10 @@
           <version>${maven-surefire-plugin.version}</version>
           <configuration>
             <useSystemClassLoader>false</useSystemClassLoader>
-            <!-- Use a new forked process for each test See https://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html -->
             <forkCount>1</forkCount>
             <reuseForks>false</reuseForks>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <!-- use default JVM settings <argLine>-Xmx256m</argLine> -->
             <runOrder>random</runOrder>
-
             <includes>
               <!-- include regular unit tests -->
               <include>**/*Test.java</include>
@@ -259,7 +249,9 @@
             <arguments>-Dmaven.javadoc.skip=true</arguments>
             <useReleaseProfile>true</useReleaseProfile>
             <releaseProfiles>release</releaseProfiles>
-            <tagNameFormat>${project.artifactId}-@{project.version}</tagNameFormat>
+            <!-- literal, not ${project.artifactId}: the reactor root is text-tree-parent but the
+                 established tag convention is text-tree-1.7.0, text-tree-2.0.0, ... -->
+            <tagNameFormat>text-tree-@{project.version}</tagNameFormat>
           </configuration>
         </plugin>
       </plugins>
@@ -271,27 +263,26 @@
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>${maven-jar-plugin.version}</version>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
       </plugin>
       <!-- run integration tests (*IT) during verify -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
       </plugin>
     </plugins>
   </build>
