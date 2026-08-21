@@ -60,14 +60,15 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   // to avoid dependency on apache or guava
   static boolean isBlank(String x) {
-    int strLen;
-    if (x == null || (strLen = x.length()) == 0) return true;
-    for (int i = 0; i < strLen; i++) {
+    if (x == null) {
+      return true;
+    }
+    for (int i = 0; i < x.length(); i++) {
       if (!Character.isWhitespace(x.charAt(i))) {
         return false;
       }
     }
-    return false;
+    return true;
   }
 
   /**

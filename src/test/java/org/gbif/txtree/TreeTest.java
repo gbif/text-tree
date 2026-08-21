@@ -281,6 +281,24 @@ public class TreeTest {
     assertTrue(abies_alba_found);
   }
 
+  @Test
+  public void blankLinesAreSkipped() throws Exception {
+    // a line holding only spaces or a tab is not content and must be skipped by both
+    // verify() and simple() — they disagreed until 2.0.0
+    assertTrue(Tree.verify(resource("blanklines.txtree")).valid);
+
+    var tree = Tree.simple(resource("blanklines.txtree"));
+    assertEquals(4, tree.size());
+
+    StringWriter buffer = new StringWriter();
+    tree.print(buffer);
+    assertEquals("""
+        Chordata [phylum]
+          Mammalia [class]
+            Canis [genus]
+          Aves [class]""", buffer.toString().trim());
+  }
+
   static InputStream resource(String resourceName) {
     return ClassLoader.getSystemResourceAsStream(resourceName);
   }
