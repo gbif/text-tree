@@ -332,6 +332,28 @@ public class TreeTest {
     assertTrue(parents.stream().skip(1).allMatch(java.util.Objects::nonNull));
   }
 
+  @Test
+  public void verifyRejectsWhatParseRejects() throws Exception {
+    // verify() seeded its indent tracking at 0, so it accepted a tree whose very first content line
+    // was already indented - which parse() then refused for want of a root. ChecklistBank validates
+    // uploads with verify() and imports them with simple(), so such a file passed validation and
+    // failed the import.
+    for (String bad : new String[]{
+        "  Aaa [genus]\n    Bbb [species]",   // whole file shifted one level
+        "  Aaa [genus]\nBbb [genus]",         // first line indented, the rest at the root
+        "  Aaa [genus]"                       // a single indented line
+    }) {
+      assertFalse(Tree.verify(new StringReader(bad)).valid, () -> "should be invalid: " + bad);
+      assertThrows(IllegalArgumentException.class, () -> Tree.simple(new StringReader(bad)),
+          () -> "should not parse: " + bad);
+    }
+
+    // and a properly rooted tree still verifies and parses
+    String good = "Aaa [genus]\n  Bbb [species]";
+    assertTrue(Tree.verify(new StringReader(good)).valid);
+    assertEquals(2, Tree.simple(new StringReader(good)).size());
+  }
+
   static InputStream resource(String resourceName) {
     return ClassLoader.getSystemResourceAsStream(resourceName);
   }

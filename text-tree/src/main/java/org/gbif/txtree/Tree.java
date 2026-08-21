@@ -217,6 +217,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     try {
       int max = 0;
       int last = 0;
+      boolean rooted = false;
       while (line != null) {
         if (!isBlank(line)) {
           Matcher m = LINE_PARSER.matcher(line);
@@ -226,9 +227,15 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
             if (level % 2 != 0) {
               return VerificationResult.failed(String.format("Tree is not indented properly on line %s. Use 2 spaces only: %s", lineNumber, line), lineNumber);
             }
+            if (!rooted && level > 0) {
+              // the first name in the file has nothing to hang off, so it must sit at the root level.
+              // Without this, a whole file shifted right by one level verified but would not parse.
+              return VerificationResult.failed(String.format("Tree does not start at the root level. Line %s is indented: %s", lineNumber, line), lineNumber);
+            }
             if (level-last>2) {
               return VerificationResult.failed(String.format("Tree is indented too much on line %s. Use 2 spaces only: %s", lineNumber, line), lineNumber);
             }
+            rooted = true;
             last = level;
           } else {
             return VerificationResult.failed(String.format("Failed to parse Tree on line %s: %s", lineNumber, line), lineNumber);
