@@ -49,19 +49,65 @@ public final class ParsedTree {
   private ParsedTree() {
   }
 
+  /**
+   * Reads a tree from a UTF8 input stream, running every name through the given parser.
+   *
+   * @param stream the UTF8 input stream to parse
+   * @param parser the name parser to run each name through, never null
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted, or a rank was unknown or
+   *         ambiguous with no {@code CODE} in scope
+   */
   public static Tree<ParsedTreeNode> parse(InputStream stream, NameParser parser) throws IOException {
     return parse(stream, parser, null);
   }
 
+  /**
+   * Reads a tree from a UTF8 input stream, running every name through the given parser.
+   * In addition to {@link #parse(InputStream, NameParser)} it takes an optional listener that is
+   * passed the verbatim tree line for each processed row.
+   *
+   * @param stream   the UTF8 input stream to parse
+   * @param parser   the name parser to run each name through, never null
+   * @param listener optional listener passed the verbatim line for each processed row, may be null
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted, or a rank was unknown or
+   *         ambiguous with no {@code CODE} in scope
+   */
   public static Tree<ParsedTreeNode> parse(InputStream stream, NameParser parser,
                                            Consumer<TreeLine> listener) throws IOException {
     return parse(new InputStreamReader(stream, StandardCharsets.UTF_8), parser, listener);
   }
 
+  /**
+   * Reads a tree from a reader, running every name through the given parser.
+   *
+   * @param reader the tree input
+   * @param parser the name parser to run each name through, never null
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted, or a rank was unknown or
+   *         ambiguous with no {@code CODE} in scope
+   */
   public static Tree<ParsedTreeNode> parse(Reader reader, NameParser parser) throws IOException {
     return parse(reader, parser, null);
   }
 
+  /**
+   * Reads a tree from a reader, running every name through the given parser.
+   * In addition to {@link #parse(Reader, NameParser)} it takes an optional listener that is passed
+   * the verbatim tree line for each processed row.
+   *
+   * @param reader   the tree input
+   * @param parser   the name parser to run each name through, never null
+   * @param listener optional listener passed the verbatim line for each processed row, may be null
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted, or a rank was unknown or
+   *         ambiguous with no {@code CODE} in scope
+   */
   public static Tree<ParsedTreeNode> parse(Reader reader, NameParser parser,
                                            Consumer<TreeLine> listener) throws IOException {
     return Tree.parse(reader, listener, factory(parser));
@@ -71,6 +117,9 @@ public final class ParsedTree {
    * The node factory this class drives, exposed so it can be handed to
    * {@link Tree#parse(Reader, Consumer, TreeNodeFactory)} directly. Stateless and reusable;
    * thread safety follows the parser you supply.
+   *
+   * @param parser the name parser to run each name through, never null
+   * @return a factory building {@link ParsedTreeNode}s off that parser
    */
   public static TreeNodeFactory<ParsedTreeNode> factory(NameParser parser) {
     Objects.requireNonNull(parser, "parser required");

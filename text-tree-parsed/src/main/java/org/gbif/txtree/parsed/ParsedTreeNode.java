@@ -41,6 +41,14 @@ public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
    */
   public final NomCode code;
 
+  /**
+   * Creates a node from one parsed line and the outcome of running its name through a parser.
+   *
+   * @param data   the components of the line this node was read from
+   * @param rank   the resolved rank, or null if the line carried none
+   * @param code   the nomenclatural code in scope, or null if none was declared
+   * @param result the parse result for {@link #name}, never null
+   */
   public ParsedTreeNode(TreeNodeData data, Rank rank, NomCode code, ParseResult result) {
     super(data.id(), data.name(), rankName(rank), data.extinct(), data.basionym(),
         data.homotypic(), data.provisional(), data.infos(), data.comment());

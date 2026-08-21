@@ -13,14 +13,23 @@ import java.util.regex.Pattern;
  * We use this to compare nub build outputs with a very simple text based tree format that is very easy to read.
  * Especially useful for larger tree snippets.
  *
- * Iterating over the tree goes in
+ * <p>Iterating over the tree goes depth first: each name, then its synonyms, then its children.
+ *
+ * @param <T> the node type this tree holds, see {@link #simple(InputStream)} for the string based
+ *            one and {@link #parse(Reader, Consumer, TreeNodeFactory)} to supply your own
  */
 public class Tree<T extends TreeNode<T>> implements Iterable<T> {
+  /** The synonym prefix used by older files, equivalent to {@link #SYNONYM_SYMBOL}. */
   public static final String SYNONYM_OLD_SYMBOL = "*";
+  /** Prefix marking a name as a synonym of the name it is nested under. */
   public static final String SYNONYM_SYMBOL = "=";
+  /** Prefix marking a synonym as homotypic with the name it is nested under. */
   public static final String HOMOTYPIC_SYMBOL = "≡";
+  /** Prefix marking a name as the basionym. */
   public static final String BASIONYM_SYMBOL = "$";
+  /** Prefix marking a taxon as extinct. */
   public static final String EXTINCT_SYMBOL = "†";
+  /** Prefix marking a name as provisional. */
   public static final String PROVISIONAL_SYMBOL = "?";
 
   private static final String ANY_CHAR = "[^\t\n\r]";
@@ -40,6 +49,15 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
 
   /**
+   * Creates an empty tree. Use {@link #simple(InputStream)} or
+   * {@link #parse(Reader, Consumer, TreeNodeFactory)} to read one from an input.
+   */
+  public Tree() {
+  }
+
+  /**
+   * The number of names read into this tree, counting synonyms and children alike.
+   *
    * @return the total number of nodes in the tree
    */
   public long size() {
@@ -84,15 +102,40 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * Builds a new simple tree instance by parsing the given UTF8 input stream.
    * In addition to {@link #simple(InputStream)} it takes an optional listener
    * that is passed the verbatim tree line instance for each processed row.
+   *
+   * @param stream   the UTF8 input stream to parse
+   * @param listener optional listener passed the verbatim line for each processed row, may be null
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted
    */
   public static Tree<SimpleTreeNode> simple(InputStream stream, Consumer<TreeLine> listener) throws IOException {
     return parse(new InputStreamReader(stream, StandardCharsets.UTF_8), listener, Tree::simpleNode);
   }
 
+  /**
+   * Builds a new simple tree instance by parsing the given reader.
+   *
+   * @param reader the tree input
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted
+   */
   public static Tree<SimpleTreeNode> simple(Reader reader) throws IOException {
     return parse(reader, null, Tree::simpleNode);
   }
 
+  /**
+   * Builds a new simple tree instance by parsing the given reader.
+   * In addition to {@link #simple(Reader)} it takes an optional listener
+   * that is passed the verbatim tree line instance for each processed row.
+   *
+   * @param reader   the tree input
+   * @param listener optional listener passed the verbatim line for each processed row, may be null
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted
+   */
   public static Tree<SimpleTreeNode> simple(Reader reader, Consumer<TreeLine> listener) throws IOException {
     return parse(reader, listener, Tree::simpleNode);
   }
@@ -104,6 +147,10 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * @param reader   the tree input
    * @param listener optional listener passed the verbatim line for each processed row, may be null
    * @param factory  builds a node from the components of each line and its parent
+   * @param <T>      the node type the factory builds
+   * @return the new tree instance
+   * @throws IOException if the input could not be read
+   * @throws IllegalArgumentException if the input was badly formatted, or the factory rejected a line
    */
   public static <T extends TreeNode<T>> Tree<T> parse(Reader reader,
                                                       Consumer<TreeLine> listener,
@@ -176,11 +223,22 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     );
   }
 
+  /** The outcome of {@link #verify(InputStream)}. */
   public static class VerificationResult {
+    /** True if the input is a well formed text tree. */
     public final boolean valid;
+    /** The number of lines read, which for an invalid tree is the line the problem was found on. */
     public final int lines;
+    /** A human readable description of the problem, or a confirmation that the tree is valid. */
     public final String message;
 
+    /**
+     * Creates a verification outcome.
+     *
+     * @param valid   true if the input is a well formed text tree
+     * @param lines   the number of lines read
+     * @param message a human readable description of the outcome
+     */
     public VerificationResult(boolean valid, int lines, String message) {
         this.valid = valid;
         this.lines = lines;
@@ -198,7 +256,8 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * Verifies that the given input stream contains a valid text tree.
    * Especially useful for verifying that the tree is properly indented.
    * @param stream tree input
-   * @return error message or NULL if the input stream contains a valid text tree
+   * @return the outcome, never null. Check {@link VerificationResult#valid}.
+   * @throws IOException if the input could not be read
    */
   public static VerificationResult verify(InputStream stream) throws IOException {
     return verify(new InputStreamReader(stream, StandardCharsets.UTF_8));
@@ -208,7 +267,8 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
    * Verifies that the given input stream contains a valid text tree.
    * Especially useful for verifying that the tree is properly indented.
    * @param reader tree input
-   * @return error message or NULL if the input stream contains a valid text tree
+   * @return the outcome, never null. Check {@link VerificationResult#valid}.
+   * @throws IOException if the input could not be read
    */
   public static VerificationResult verify(Reader reader) throws IOException {
     var br = new BufferedReader(reader);
@@ -291,12 +351,21 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     return Collections.emptyMap();
   }
 
+  /**
+   * The names sitting at the root level, in the order they were read. The list is mutable and backs
+   * the tree directly.
+   *
+   * @return the root level nodes
+   */
   public List<T> getRoot() {
     return root;
   }
 
   /**
    * Prints the entire tree to a given output
+   *
+   * @param out the output to append to
+   * @throws IOException if the output could not be written to
    */
   public void print(Appendable out) throws IOException {
     for (T n : root) {
@@ -307,6 +376,9 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   /**
    * Prints the tree into a given output stream using UTF8.
    * The stream remains open and must be closed by the caller.
+   *
+   * @param out the stream to write to
+   * @throws IOException if the output could not be written to
    */
   public void print(OutputStream out) throws IOException {
     Writer w = new OutputStreamWriter(out, StandardCharsets.UTF_8);
@@ -316,6 +388,9 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   /**
    * Prints the tree into a new UTF8 encoded text file.
+   *
+   * @param f the file to create or overwrite
+   * @throws IOException if the file could not be written
    */
   public void print(File f) throws IOException {
     try (Writer w = new FileWriter(f, StandardCharsets.UTF_8)) {
@@ -326,6 +401,9 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   /**
    * Prints the tree into a given PrintStream using UTF8.
+   *
+   * @param out the stream to write to
+   * @throws IOException if the output could not be written to
    */
   public void print(PrintStream out) throws IOException {
     print((Appendable)out);
