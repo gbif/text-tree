@@ -1,6 +1,5 @@
 package org.gbif.txtree;
 
-import org.apache.commons.lang3.StringUtils;
 import org.gbif.nameparser.NameParserImpl;
 import org.gbif.nameparser.api.NameParser;
 import org.gbif.nameparser.api.ParsedName;
@@ -69,6 +68,15 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       }
     }
     return true;
+  }
+
+  // to avoid dependency on apache or guava
+  static String trimToNull(String x) {
+    if (x == null) {
+      return null;
+    }
+    String trimmed = x.trim();
+    return trimmed.isEmpty() ? null : trimmed;
   }
 
   /**
@@ -233,7 +241,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       int max = 0;
       int last = 0;
       while (line != null) {
-        if (!StringUtils.isBlank(line)) {
+        if (!isBlank(line)) {
           Matcher m = LINE_PARSER.matcher(line);
           if (m.find()) {
             int level = m.group(1).length();
@@ -270,7 +278,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean extinct = flags.contains(EXTINCT_SYMBOL);
     boolean provisional = flags.contains(PROVISIONAL_SYMBOL);
     String name = m.group(3).trim();
-    String rank = StringUtils.trimToNull(m.group(4));
+    String rank = trimToNull(m.group(4));
     return new SimpleTreeNode(row, name, rank, extinct, basionym, homotypic, provisional, parseInfos(m.group(5)), m.group(6));
   }
 
@@ -282,7 +290,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
     boolean provisional = flags.contains(PROVISIONAL_SYMBOL);
     String name = m.group(3).trim();
     Rank rank = null;
-    String vrank = StringUtils.trimToNull(m.group(4));
+    String vrank = trimToNull(m.group(4));
     if (vrank != null) {
       rank = Rank.valueOf(vrank.toUpperCase().replace(' ', '_'));
     }
