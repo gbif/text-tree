@@ -82,7 +82,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   /**
    * Builds a new simple tree instance by parsing the given UTF8 input stream.
-   * In addition to {@link #simple(InputStream) read(InputStream)} it takes an optional listener
+   * In addition to {@link #simple(InputStream)} it takes an optional listener
    * that is passed the verbatim tree line instance for each processed row.
    */
   public static Tree<SimpleTreeNode> simple(InputStream stream, Consumer<TreeLine> listener) throws IOException {
@@ -109,6 +109,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
                                                       Consumer<TreeLine> listener,
                                                       TreeNodeFactory<T> factory
                                                       ) throws IOException {
+    Objects.requireNonNull(factory, "factory required");
     Tree<T> tree = new Tree<>();
     LinkedList<T> parents = new LinkedList<>();
 
@@ -143,6 +144,7 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
           }
 
           T n = factory.create(data(row, m), parent);
+          Objects.requireNonNull(n, "factory returned no node for line " + row);
           if (parent == null) {
             tree.getRoot().add(n);
           } else if (isSynonym(m.group(2))) {

@@ -11,7 +11,8 @@ public interface TreeNodeFactory<T extends TreeNode<T>> {
    * @param data   the components of the line being read
    * @param parent the node this one hangs under, or null when it sits at the root level. Lets a
    *               node inherit from its ancestors without the factory holding state of its own.
-   *               For a synonym this is the accepted name it is nested under.
+   *               For a synonym this is the node it is nested under, usually the accepted name.
+   * @return the new node, never null
    */
   T create(TreeNodeData data, T parent);
 }

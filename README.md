@@ -134,7 +134,7 @@ alongside the verbatim string.
 </dependency>
 ```
 
-You supply the parser. text-tree depends on `name-parser-api` only, never on an implementation —
+You supply the parser. text-tree-parsed depends on `name-parser-api` only, never on an implementation —
 the current one, [`name-parser-rust`](https://github.com/gbif/name-parser-rust), needs JDK 22+ and
 a per-platform native jar, which text-tree does not force on anyone who is only reading trees:
 
@@ -210,6 +210,8 @@ remaining bits.
   comes back out as `[division_botany]`. The disambiguation is information the tree did not carry
   before.
 - A line containing only whitespace is now skipped rather than failing the parse.
+- text-tree no longer brings `slf4j-api`, `commons-lang3`, `jsr305` or `fastutil` onto your
+  classpath. If you were relying on any of them transitively, declare them yourself.
 
 
 ## Visual Studio Code Extension

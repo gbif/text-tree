@@ -16,7 +16,16 @@ import java.util.Objects;
  */
 public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
 
-  /** The full three way parse result for {@link #name}. Never null. */
+  /**
+   * The full three way parse result for {@link #name}. Never null.
+   *
+   * <p>For a {@link ParseResult.Parsed} result, the {@link ParsedName} it wraps is the same object
+   * as {@link #parsedName}: the tree's rank and code are written back onto it, so
+   * {@code result.code()} reflects the tree's code, not necessarily what the parser inferred. For
+   * an {@link ParseResult.Informal} result {@code result} and {@link #parsedName} are unrelated
+   * objects, so {@code result.code()} stays the parser's own answer while {@link #parsedName}'s
+   * code is still the tree's.
+   */
   public final ParseResult result;
 
   /**
@@ -27,8 +36,8 @@ public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
   public final ParsedName parsedName;
 
   /**
-   * The nomenclatural code in scope for this name: its own {@code CODE} info if it declared one,
-   * otherwise the one inherited from its parent. Null when the tree declares none.
+   * The nomenclatural code in scope for this name: its own {@code CODE} info if it declares a
+   * recognised one, otherwise the one inherited from its parent. Null when the tree declares none.
    */
   public final NomCode code;
 
@@ -41,7 +50,7 @@ public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
   }
 
   private static String rankName(Rank rank) {
-    return rank == null || rank == Rank.UNRANKED ? null : rank.name().toLowerCase(Locale.ROOT);
+    return rank == null ? null : rank.name().toLowerCase(Locale.ROOT);
   }
 
   private static ParsedName parsedNameOf(ParseResult result, Rank rank, NomCode code) {

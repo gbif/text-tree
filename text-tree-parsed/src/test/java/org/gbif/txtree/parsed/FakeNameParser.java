@@ -25,9 +25,13 @@ class FakeNameParser implements NameParser {
   /** The code handed to each call, in call order. May contain nulls. */
   final List<NomCode> codesSeen = new ArrayList<>();
 
+  /** The rank handed to each call, in call order. May contain nulls. */
+  final List<Rank> ranksSeen = new ArrayList<>();
+
   @Override
   public ParseResult parse(String scientificName, String authorship, Rank rank, NomCode code) {
     codesSeen.add(code);
+    ranksSeen.add(rank);
     if (scientificName.startsWith("BOLD:")) {
       return new ParseResult.Unparsable(NameType.PLACEHOLDER, null, scientificName);
     }

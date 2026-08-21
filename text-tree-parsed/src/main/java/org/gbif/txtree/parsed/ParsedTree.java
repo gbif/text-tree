@@ -35,8 +35,9 @@ import java.util.function.Consumer;
  *
  * <p>The {@code CODE} info key sets the nomenclatural code for a name and is inherited by its
  * descendants, as in ChecklistBank. It disambiguates the ranks that exist once per code
- * ({@code division}, {@code section}, {@code series} and their sub/super forms) and is passed on
- * to the name parser.
+ * ({@code division}, plus {@code section} and {@code series} with their sub/super forms;
+ * {@code subdivision} and {@code superdivision} are single ranks and need no code) and is passed
+ * on to the name parser.
  */
 public final class ParsedTree {
 
@@ -68,7 +69,8 @@ public final class ParsedTree {
 
   /**
    * The node factory this class drives, exposed so it can be handed to
-   * {@link Tree#parse(Reader, Consumer, TreeNodeFactory)} directly. Stateless and reusable.
+   * {@link Tree#parse(Reader, Consumer, TreeNodeFactory)} directly. Stateless and reusable;
+   * thread safety follows the parser you supply.
    */
   public static TreeNodeFactory<ParsedTreeNode> factory(NameParser parser) {
     Objects.requireNonNull(parser, "parser required");
@@ -103,7 +105,10 @@ public final class ParsedTree {
    * <p>A rank that names a constant outright is taken verbatim, including an explicitly
    * code-qualified {@code [division zoology]} — deliberately not run through
    * {@link RankUtils#bestCodeCompliantRank}, which would rewrite it under a conflicting
-   * {@code CODE}. Only the bare ambiguous form is resolved by the code in scope.
+   * {@code CODE}. Only the bare ambiguous form is resolved by the code in scope. A code that is
+   * neither zoological nor botany-ish (e.g. {@code VIRUS}) leaves that resolution falling back to
+   * the botanical constant — {@link RankUtils#bestCodeCompliantRank}'s own fallback, not this
+   * method's.
    *
    * @param value the verbatim rank, may be null
    * @param line  the line it was read from, used in the error message

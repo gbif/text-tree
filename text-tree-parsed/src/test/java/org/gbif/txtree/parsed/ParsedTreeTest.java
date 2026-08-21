@@ -61,6 +61,21 @@ public class ParsedTreeTest {
   }
 
   @Test
+  public void explicitUnrankedRoundTrips() throws Exception {
+    // [unranked] is a real marker written in the tree, not the parser's "I don't know" default -
+    // it must survive parse + print unchanged, matching Tree.simple's behaviour for the same input
+    String content = "Abies [unranked]";
+    Tree<ParsedTreeNode> t = ParsedTree.parse(tree(content), parser);
+
+    ParsedTreeNode n = t.getRoot().get(0);
+    assertEquals("unranked", n.rank);
+
+    StringWriter buffer = new StringWriter();
+    t.print(buffer);
+    assertEquals(content, buffer.toString().trim());
+  }
+
+  @Test
   public void theTreeRankOverridesTheParsedOne() throws Exception {
     // FakeNameParser always reports UNRANKED, so GENUS here can only come from the [genus] marker
     ParsedTreeNode n = first("Abies [genus]");
@@ -99,6 +114,21 @@ public class ParsedTreeTest {
     assertEquals(NomCode.BOTANICAL, root.code);
     assertEquals(NomCode.BOTANICAL, child.code);
     assertEquals("division_botany", child.rank);
+    // the write-back onto the parsed name must happen too, or deleting it would go unnoticed here
+    assertEquals(NomCode.BOTANICAL, child.parsedName.getCode());
+  }
+
+  @Test
+  public void codeIsInheritedAcrossMultipleLevels() throws Exception {
+    // a naive `parent.infos().get("CODE")` (instead of `parent.code`) passes every other test in
+    // this file, because the middle node here either declares its own CODE or the tree is only
+    // two levels deep. Only the ROOT declares CODE; the middle node declares nothing.
+    Tree<ParsedTreeNode> tree = ParsedTree.parse(
+        tree("Plantae [kingdom] {CODE=botany}\n  Bryophyta [phylum]\n    Foo [division]"), parser);
+
+    ParsedTreeNode grandchild = tree.getRoot().get(0).children.getFirst().children.getFirst();
+    assertEquals(NomCode.BOTANICAL, grandchild.code);
+    assertEquals("division_botany", grandchild.rank);
   }
 
   @Test
@@ -145,6 +175,14 @@ public class ParsedTreeTest {
     ParsedTree.parse(tree("Plantae [kingdom] {CODE=botany}\n  Abies [genus]"), parser);
 
     assertEquals(List.of(NomCode.BOTANICAL, NomCode.BOTANICAL), parser.codesSeen);
+  }
+
+  @Test
+  public void theRankIsPassedToTheParser() throws Exception {
+    // passing null as the resolved rank would go unnoticed without asserting on it directly
+    ParsedTree.parse(tree("Plantae [kingdom] {CODE=botany}\n  Bryophyta [division]"), parser);
+
+    assertEquals(List.of(Rank.KINGDOM, Rank.DIVISION_BOTANY), parser.ranksSeen);
   }
 
   @Test

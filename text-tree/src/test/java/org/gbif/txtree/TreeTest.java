@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
@@ -262,7 +263,7 @@ public class TreeTest {
   @Test
   public void blankLinesAreSkipped() throws Exception {
     // a line holding only spaces or a tab is not content and must be skipped by both
-    // verify() and simple() — they disagreed until 2.0.0
+    // verify() and simple() — they disagreed on blank lines specifically until 2.0.0
     assertTrue(Tree.verify(resource("blanklines.txtree")).valid);
 
     var tree = Tree.simple(resource("blanklines.txtree"));
@@ -275,6 +276,32 @@ public class TreeTest {
           Mammalia [class]
             Canis [genus]
           Aves [class]""", buffer.toString().trim());
+  }
+
+  @Test
+  public void multipleRootsAndARootLevelSynonym() throws Exception {
+    // dwca.txt (2 roots) and test-ranks.txt (96 roots) only ever reach verify(), never parse() -
+    // pin down that parse() itself copes with more than one root and with a root-level synonym,
+    // the two branches the parent-stack reorder touched
+    String content = """
+        Aaa [genus]
+          Bbb [species]
+        Ccc [genus]
+        =Ddd [species]""";
+
+    var tree = Tree.simple(new StringReader(content));
+
+    assertEquals(4, tree.size());
+    assertEquals(3, tree.getRoot().size());
+    assertEquals("Aaa", tree.getRoot().get(0).name);
+    assertEquals(1, tree.getRoot().get(0).children.size());
+    assertEquals("Bbb", tree.getRoot().get(0).children.getFirst().name);
+    assertEquals("Ccc", tree.getRoot().get(1).name);
+    // the = prefix at root level must not make Ddd land in some node's synonyms list instead
+    assertEquals("Ddd", tree.getRoot().get(2).name);
+    for (var n : tree) {
+      assertTrue(n.synonyms.isEmpty());
+    }
   }
 
   @Test
