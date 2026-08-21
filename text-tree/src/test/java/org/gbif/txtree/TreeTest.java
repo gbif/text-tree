@@ -184,28 +184,6 @@ public class TreeTest {
   }
 
   @Test
-  public void parsed() throws Exception {
-    Tree<ParsedTreeNode> tree = Tree.parsed(resource("test2.txt"));
-
-    tree.print(System.out);
-
-    StringWriter buffer = new StringWriter();
-    tree.print(buffer);
-    assertEquals(read("test2-no-comments.txt").trim(), buffer.toString().trim());
-
-    System.out.println("Tree traversal");
-    for (ParsedTreeNode n : tree) {
-      System.out.println(n.name);
-      assertNotNull(n.name);
-      if (!n.name.startsWith("californicum")) {
-        assertNotNull(n.rank);
-      }
-      assertNotNull(n.parsedName);
-      System.out.println(n.parsedName.canonicalNameComplete()+"\n");
-    }
-  }
-
-  @Test
   public void testVerify() throws Exception {
     assertFalse(Tree.verify(resource("badly-indented.txt")).valid);
 

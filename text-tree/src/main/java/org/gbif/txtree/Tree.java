@@ -1,13 +1,5 @@
 package org.gbif.txtree;
 
-import org.gbif.nameparser.NameParserImpl;
-import org.gbif.nameparser.api.NameParser;
-import org.gbif.nameparser.api.ParsedName;
-import org.gbif.nameparser.api.Rank;
-import org.gbif.nameparser.api.UnparsableNameException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -31,7 +23,6 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
   public static final String EXTINCT_SYMBOL = "†";
   public static final String PROVISIONAL_SYMBOL = "?";
 
-  private static final Logger LOG = LoggerFactory.getLogger(Tree.class);
   private static final String ANY_CHAR = "[^\t\n\r]";
   private static final Pattern LINE_PARSER = Pattern.compile("^" +
       "((?:  )*)" + // indent #1
@@ -43,7 +34,6 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
       "\\s*$");
   private static final Pattern INFO_PARSER = Pattern.compile("([A-Z]+)=([^=]+)(?: |$)");
   private static final Pattern COMMA_SPLITTER = Pattern.compile("\\s*(?<!,),(?!,)\\s*");
-  private static final NameParser NAME_PARSER = new NameParserImpl();
   private long count;
   private final List<T> root = new ArrayList<>();
 
@@ -105,34 +95,6 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   public static Tree<SimpleTreeNode> simple(Reader reader, Consumer<TreeLine> listener) throws IOException {
     return parse(reader, listener, Tree::simpleNode);
-  }
-
-  /**
-   * Builds a new parsed tree instance by parsing the given UTF8 input stream
-   * and using the GBIF name parser to create parsed names.
-   *
-   * @param stream the input stream to parse
-   * @return the new tree instance
-   * @throws IOException if the input could not be read
-   * @throws IllegalArgumentException if the input contained was badly formatted
-   */
-  public static Tree<ParsedTreeNode> parsed(InputStream stream) throws IOException {
-    return parsed(stream, null);
-  }
-
-  public static Tree<ParsedTreeNode> parsed(Reader reader) throws IOException {
-    return parse(reader, null, Tree::parsedNode);
-  }
-
-  /**
-   * Builds a new parsed tree instance by parsing the given UTF8 input stream
-   * and using the GBIF name parser to create parsed names.
-   *
-   * In addition to {@link #parsed(InputStream) read(InputStream)} it takes an optional listener
-   * that is passed the verbatim tree line instance for each processed row.
-   */
-  public static Tree<ParsedTreeNode> parsed(InputStream stream, Consumer<TreeLine> listener) throws IOException {
-    return parse(new InputStreamReader(stream, StandardCharsets.UTF_8), listener, Tree::parsedNode);
   }
 
   /**
@@ -301,23 +263,6 @@ public class Tree<T extends TreeNode<T>> implements Iterable<T> {
 
   private static SimpleTreeNode simpleNode(TreeNodeData d, SimpleTreeNode parent) {
     return new SimpleTreeNode(d.id(), d.name(), d.rank(), d.extinct(), d.basionym(),
-        d.homotypic(), d.provisional(), d.infos(), d.comment());
-  }
-
-  private static ParsedTreeNode parsedNode(TreeNodeData d, ParsedTreeNode parent) {
-    Rank rank = null;
-    if (d.rank() != null) {
-      rank = Rank.valueOf(d.rank().toUpperCase().replace(' ', '_'));
-    }
-
-    ParsedName pn = null;
-    try {
-      pn = NAME_PARSER.parse(d.name(), null, rank, null);
-      pn.setRank(rank); // make sure to keep the original rank
-    } catch (UnparsableNameException e) {
-      LOG.warn("Failed to parse {} {}", e.getType(), e.getName());
-    }
-    return new ParsedTreeNode(d.id(), d.name(), pn, d.extinct(), d.basionym(),
         d.homotypic(), d.provisional(), d.infos(), d.comment());
   }
 
