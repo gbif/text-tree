@@ -25,9 +25,9 @@ import java.util.function.Consumer;
  * Reads TextTree input into {@link ParsedTreeNode}s, running every name through a
  * {@link NameParser} supplied by the caller.
  *
- * <p>text-tree depends on {@code name-parser-api} only, never on an implementation: the current
- * one, {@code org.gbif.nameparser:name-parser-rust}, needs JDK 22+ and a per platform native jar,
- * which would otherwise be forced on every consumer. Wire it up yourself:
+ * <p>text-tree-parsed depends on {@code name-parser-api} only, never on an implementation: the
+ * current one, {@code org.gbif.nameparser:name-parser-rust}, needs JDK 22+ and a per platform
+ * native jar, which would otherwise be forced on every consumer. Wire it up yourself:
  *
  * <pre>{@code
  * Tree<ParsedTreeNode> tree = ParsedTree.parse(in, new NameParserRust());
