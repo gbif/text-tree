@@ -17,21 +17,19 @@ import java.util.Objects;
 public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
 
   /**
-   * The full three way parse result for {@link #name}. Never null.
+   * The full parse result for {@link #name}: {@link ParseResult.Parsed}, informal names included,
+   * or {@link ParseResult.Unparsable}. Never null.
    *
    * <p>For a {@link ParseResult.Parsed} result, the {@link ParsedName} it wraps is the same object
    * as {@link #parsedName}: the tree's rank and code are written back onto it, so
-   * {@code result.code()} reflects the tree's code, not necessarily what the parser inferred. For
-   * an {@link ParseResult.Informal} result {@code result} and {@link #parsedName} are unrelated
-   * objects, so {@code result.code()} stays the parser's own answer while {@link #parsedName}'s
-   * code is still the tree's.
+   * {@code result.code()} reflects the tree's code, not necessarily what the parser inferred.
    */
   public final ParseResult result;
 
   /**
-   * The structured name. Null only for a {@link ParseResult.Unparsable} result — an
-   * {@link ParseResult.Informal} result contributes its rebuilt taxon anchor, matching the
-   * type=INFORMAL ParsedName that the 4.x Java parser returned instead of throwing.
+   * The structured name. Null only for a {@link ParseResult.Unparsable} result. An informal name
+   * ("Rhizobium sp.") is a ParsedName of type INFORMAL; {@link ParsedName#anchor()} gives the taxon
+   * it hangs off.
    */
   public final ParsedName parsedName;
 
@@ -62,9 +60,7 @@ public class ParsedTreeNode extends TreeNode<ParsedTreeNode> {
   }
 
   private static ParsedName parsedNameOf(ParseResult result, Rank rank, NomCode code) {
-    ParsedName pn = result instanceof ParseResult.Informal informal
-        ? informal.toParsedName()
-        : result.parsed().orElse(null);
+    ParsedName pn = result.parsed().orElse(null);
     if (pn != null) {
       // keep the rank and code the tree declared, not whatever the parser inferred
       if (rank != null) {

@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A NameParser stand-in returning each of the three ParseResult variants on demand, so the mapping
- * into ParsedTreeNode can be tested without depending on a real parser implementation.
+ * A NameParser stand-in returning each kind of ParseResult on demand, so the mapping into
+ * ParsedTreeNode can be tested without depending on a real parser implementation.
  *
  * <ul>
  *   <li>a name starting with {@code BOLD:} yields an Unparsable result</li>
- *   <li>a name ending in {@code " sp."} yields an Informal result</li>
+ *   <li>a name ending in {@code " sp."} yields a Parsed result of type INFORMAL</li>
  *   <li>anything else yields a Parsed result, always reporting rank UNRANKED</li>
  * </ul>
  */
@@ -36,8 +36,12 @@ class FakeNameParser implements NameParser {
       return new ParseResult.Unparsable(NameType.PLACEHOLDER, null, scientificName);
     }
     if (scientificName.endsWith(" sp.")) {
-      String genus = scientificName.substring(0, scientificName.indexOf(' '));
-      return new ParseResult.Informal(genus, Rank.GENUS, Rank.SPECIES, null, null);
+      ParsedName pn = new ParsedName();
+      pn.setType(NameType.INFORMAL);
+      pn.setRank(Rank.SPECIES);
+      pn.setGenus(scientificName.substring(0, scientificName.indexOf(' ')));
+      pn.setPhrase("sp.");
+      return new ParseResult.Parsed(pn);
     }
     ParsedName pn = new ParsedName();
     pn.setType(NameType.SCIENTIFIC);

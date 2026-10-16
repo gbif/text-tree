@@ -51,13 +51,15 @@ public class ParsedTreeTest {
 
   @Test
   public void informalNamesKeepAParsedName() throws Exception {
-    // 4.x returned a type=INFORMAL ParsedName rather than throwing, so parsedName stays populated
+    // an informal name is a ParsedName of type INFORMAL, anchored on its genus
     ParsedTreeNode n = first("Rhizobium sp. [species]");
 
-    assertInstanceOf(ParseResult.Informal.class, n.result);
+    assertInstanceOf(ParseResult.Parsed.class, n.result);
+    assertEquals(NameType.INFORMAL, n.result.type());
     assertNotNull(n.parsedName);
     assertEquals("Rhizobium", n.parsedName.getGenus());
     assertEquals(Rank.SPECIES, n.parsedName.getRank());
+    assertEquals("Rhizobium", n.parsedName.anchor().orElseThrow().getUninomial());
   }
 
   @Test
