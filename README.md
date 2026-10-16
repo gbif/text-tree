@@ -142,7 +142,7 @@ a per-platform native jar, which text-tree does not force on anyone who is only 
 Tree<ParsedTreeNode> tree = ParsedTree.parse(in, new NameParserRust());
 
 for (ParsedTreeNode n : tree) {
-  n.result;      // ParseResult: Parsed | Informal | Unparsable, never null
+  n.result;      // ParseResult: Parsed (informal names included) | Unparsable, never null
   n.parsedName;  // ParsedName, null only for Unparsable results
   n.code;        // NomCode in scope, or null if the tree declares none
 }
